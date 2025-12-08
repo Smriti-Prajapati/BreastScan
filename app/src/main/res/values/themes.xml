@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.BreastScan" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+
+        <!-- Background Colors -->
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/black</item>
+
+        <!-- Primary App Colors -->
+        <item name="colorPrimary">@color/pinkPrimary</item>
+        <item name="colorPrimaryVariant">@color/pinkDark</item>
+        <item name="colorSecondary">@color/pinkLight</item>
+
+        <!-- Text Colors -->
+        <item name="android:textColor">#000000</item>
+        <item name="android:textColorPrimary">#000000</item>
+        <item name="android:textColorSecondary">#444444</item>
+
+        <!-- Apply custom TextInput style -->
+        <item name="textInputStyle">@style/CustomTextInputStyle</item>
+
+        <!-- System Bars -->
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/background</item>
+
+    </style>
+
+
+    <!-- Custom TextInput Layout Style -->
+    <style name="CustomTextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+
+        <!-- FIX: Hint color (Grey, always visible, not red) -->
+        <item name="android:textColorHint">#88000000</item>
+        <item name="hintTextColor">#88000000</item>
+
+        <!-- EditText inside TextInputLayout -->
+        <item name="android:editTextColor">#FF000000</item>
+        <item name="editTextColor">#FF000000</item>
+
+        <!-- Highlight selection -->
+        <item name="android:textColorHighlight">#55000000</item>
+
+    </style>
+
+</resources>

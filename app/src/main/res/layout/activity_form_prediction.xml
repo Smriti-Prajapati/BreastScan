@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF1F4"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Form-Based Prediction"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#C2185B"
+            android:padding="10dp"
+            android:layout_gravity="center_horizontal" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:background="@android:color/white"
+            android:elevation="4dp">
+
+            <EditText android:id="@+id/et_radius_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Radius Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
+
+            <EditText android:id="@+id/et_texture_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Texture Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
+
+            <EditText android:id="@+id/et_perimeter_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Perimeter Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
+
+            <EditText android:id="@+id/et_area_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Area Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
+
+            <EditText android:id="@+id/et_smoothness_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Smoothness Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
+
+            <EditText android:id="@+id/et_compactness_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Compactness Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
+
+            <EditText android:id="@+id/et_concavity_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Concavity Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
+
+            <EditText android:id="@+id/et_concave_points_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Concave Points Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
+
+            <EditText android:id="@+id/et_symmetry_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Symmetry Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
+
+            <EditText android:id="@+id/et_fractal_dimension_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Fractal Dimension Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnPredictForm"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="Predict"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/btn_bg"
+            android:textColor="#FFFFFF" />
+
+    </LinearLayout>
+</ScrollView>

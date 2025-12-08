@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF5F8"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Breast Cancer Image Prediction"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#D81B60"
+            android:layout_marginBottom="20dp" />
+
+        <!-- IMAGE PREVIEW WITH PERFECT ROUND PINK BORDER -->
+        <FrameLayout
+            android:layout_width="260dp"
+            android:layout_height="260dp"
+            android:layout_marginBottom="20dp">
+
+            <ImageView
+                android:id="@+id/previewImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:adjustViewBounds="true"
+                android:src="@drawable/upload_placeholder"
+                android:foreground="@drawable/image_border_round" />
+
+        </FrameLayout>
+
+        <!-- Upload Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnUploadImage"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginTop="10dp"
+            android:text="Upload Image from Gallery"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            app:cornerRadius="18dp"
+            app:backgroundTint="#E91E63" />
+
+        <!-- Camera Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCamera"
+            android:layout_marginTop="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="Open Camera"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            app:cornerRadius="18dp"
+            app:backgroundTint="#F06292" />
+
+        <!-- Predict Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPredict"
+            android:layout_marginTop="25dp"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="Predict Result"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            app:cornerRadius="18dp"
+            app:backgroundTint="#C2185B" />
+
+    </LinearLayout>
+</ScrollView>

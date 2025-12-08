@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:background="#FFF1F4">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#C2185B"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="25dp"
+            android:layout_gravity="center_horizontal" />
+
+        <!-- Full Name -->
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:hint="Full Name"
+            android:padding="16dp"
+            android:background="@drawable/rounded_edittext_pink" />
+
+        <!-- Email -->
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:hint="Email"
+            android:padding="16dp"
+            android:layout_marginTop="16dp"
+            android:inputType="textEmailAddress"
+            android:background="@drawable/rounded_edittext_pink" />
+
+        <!-- Password -->
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:hint="Password"
+            android:padding="16dp"
+            android:inputType="textPassword"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rounded_edittext_pink" />
+
+        <!-- Register Button -->
+        <Button
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="Register"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="26dp"
+            android:onClick="onRegisterClick"
+            android:background="@drawable/rounded_button_pink" />
+
+    </LinearLayout>
+</ScrollView>
