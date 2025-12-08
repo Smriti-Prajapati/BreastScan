@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Brand Pink (slightly lighter for dark mode) -->
+    <color name="pinkPrimary">#FF8AB1</color>
+    <color name="pinkDark">#FF5C8A</color>
+    <color name="pinkLight">#2A2A2A</color>
+
+    <!-- Required Colors -->
+    <color name="background">#121212</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+
+    <color name="pinkBackground">#FFF1F4</color>
+
+
+
+</resources>
