@@ -9,17 +9,15 @@
     android:background="#FFF5F8"
     android:padding="20dp">
 
-    <!-- TITLE (CENTERED) -->
+    <!-- TITLE -->
     <TextView
-        android:id="@+id/tvLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Prediction Result"
+        android:text="Image Prediction Result"
         android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="#C2185B"
-        android:layout_marginBottom="25dp"
-        android:gravity="center"/>
+        android:layout_marginBottom="25dp"/>
 
     <!-- RESULT CARD -->
     <LinearLayout
@@ -39,7 +37,6 @@
             android:text="RESULT"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="#C2185B"
             android:gravity="center"
             android:layout_marginBottom="10dp"/>
 
@@ -48,7 +45,7 @@
             android:id="@+id/tvScore"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Confidence: 00.00%"
+            android:text="Confidence"
             android:textSize="14sp"
             android:textColor="#777777"
             android:gravity="center"
@@ -73,17 +70,5 @@
             android:lineSpacingExtra="4dp"/>
 
     </LinearLayout>
-
-    <!-- BUTTON -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnBack"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:text="Back to Home"
-        android:textAllCaps="false"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        app:cornerRadius="30dp"
-        app:backgroundTint="#C2185B"/>
 
 </LinearLayout>

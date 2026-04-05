@@ -9,12 +9,17 @@ import com.google.gson.JsonArray;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.OutputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 public class SupabaseClient {
 
     // ❗ These must NOT be final or hardcoded
     private static String SUPABASE_URL;
     private static String SUPABASE_ANON_KEY;
+
 
     private static final OkHttpClient client = new OkHttpClient();
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -248,4 +253,46 @@ public class SupabaseClient {
             return false;
         }
     }
+
+    public static void saveUserProfile(String userId, String token,
+                                       String age, String blood,
+                                       String history, String bmi) {
+
+        try {
+            URL url = new URL(SUPABASE_URL + "/rest/v1/profiles");
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("apikey", SUPABASE_ANON_KEY);
+            conn.setRequestProperty("Authorization", "Bearer " + token);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Prefer", "resolution=merge-duplicates");
+
+            conn.setDoOutput(true);
+
+            // ✅ convert types properly
+            int ageInt = age.isEmpty() ? 0 : Integer.parseInt(age);
+            double bmiDouble = bmi.isEmpty() ? 0.0 : Double.parseDouble(bmi);
+
+            String json = "{"
+                    + "\"id\":\"" + userId + "\","
+                    + "\"age\":" + ageInt + ","   // ✅ NO quotes
+                    + "\"blood_group\":\"" + blood + "\","
+                    + "\"medical_history\":\"" + history + "\","
+                    + "\"bmi\":" + bmiDouble      // ✅ NO quotes
+                    + "}";
+
+            OutputStream os = conn.getOutputStream();
+            os.write(json.getBytes());
+            os.close();
+
+            int responseCode = conn.getResponseCode();
+            System.out.println("Response: " + responseCode);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

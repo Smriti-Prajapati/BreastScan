@@ -1,15 +1,16 @@
 package com.example.breastscan;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.provider.MediaStore;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.gson.JsonObject;
 
 import org.tensorflow.lite.Interpreter;
 import org.tensorflow.lite.support.common.FileUtil;
@@ -20,29 +21,18 @@ import java.nio.ByteOrder;
 
 public class FormPredictionActivity extends AppCompatActivity {
 
-    private static final String TAG = "FormPredictionActivity";
     private static final String MODEL_FILE = "breast_tabular_model.tflite";
 
-    // UI fields (10)
     EditText et_radius_mean, et_texture_mean, et_perimeter_mean, et_area_mean,
             et_smoothness_mean, et_compactness_mean, et_concavity_mean,
             et_concave_points_mean, et_symmetry_mean, et_fractal_dimension_mean;
 
-    Button btnPredictForm;
+    Button btnPredictForm, btnUploadReport;
     Interpreter tflite;
 
-    // ORDER MUST MATCH MODEL (30 features)
-    private final String[] FEATURE_NAMES = new String[] {
-            "radius_mean","texture_mean","perimeter_mean","area_mean","smoothness_mean",
-            "compactness_mean","concavity_mean","concave_points_mean","symmetry_mean","fractal_dimension_mean",
-            "radius_se","texture_se","perimeter_se","area_se","smoothness_se",
-            "compactness_se","concavity_se","concave_points_se","symmetry_se","fractal_dimension_se",
-            "radius_worst","texture_worst","perimeter_worst","area_worst","smoothness_worst",
-            "compactness_worst","concavity_worst","concave_points_worst","symmetry_worst","fractal_dimension_worst"
-    };
+    private boolean isDataLoaded = false;
 
-    // Dataset mean and std (30) — used for standardization (same as you used)
-    private final float[] MEAN = new float[] {
+    private final float[] MEAN = {
             14.127292f, 19.289649f, 91.969033f, 654.889104f, 0.096360f,
             0.104341f, 0.088799f, 0.048919f, 0.181162f, 0.062798f,
             0.405172f, 1.216853f, 2.866059f, 40.337079f, 0.007041f,
@@ -51,7 +41,7 @@ public class FormPredictionActivity extends AppCompatActivity {
             0.254265f, 0.272188f, 0.114606f, 0.290076f, 0.083946f
     };
 
-    private final float[] STD = new float[] {
+    private final float[] STD = {
             3.524049f, 4.301036f, 24.298981f, 351.914129f, 0.014064f,
             0.052813f, 0.079720f, 0.038803f, 0.027388f, 0.007060f,
             0.277313f, 0.551648f, 2.021855f, 45.491006f, 0.003003f,
@@ -60,12 +50,16 @@ public class FormPredictionActivity extends AppCompatActivity {
             0.162938f, 0.208624f, 0.065732f, 0.061867f, 0.018061f
     };
 
+
     @Override
     protected void onCreate(Bundle s) {
         super.onCreate(s);
         setContentView(R.layout.activity_form_prediction);
+        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        android.util.Log.d("DEBUG_FORM", "onCreate called");
+        android.util.Log.d("FLOW", "Form opened");
 
-        // bind UI
+        // Bind UI
         et_radius_mean = findViewById(R.id.et_radius_mean);
         et_texture_mean = findViewById(R.id.et_texture_mean);
         et_perimeter_mean = findViewById(R.id.et_perimeter_mean);
@@ -78,157 +72,233 @@ public class FormPredictionActivity extends AppCompatActivity {
         et_fractal_dimension_mean = findViewById(R.id.et_fractal_dimension_mean);
 
         btnPredictForm = findViewById(R.id.btnPredictForm);
+        btnUploadReport = findViewById(R.id.btnUploadReport);
 
-        // load model
+
+        // ✅ RESTORE VALUES (VERY IMPORTANT)
+        if (s != null) {
+            et_radius_mean.setText(s.getString("r", ""));
+            et_texture_mean.setText(s.getString("t", ""));
+            et_perimeter_mean.setText(s.getString("p", ""));
+            et_area_mean.setText(s.getString("a", ""));
+            et_smoothness_mean.setText(s.getString("s", ""));
+            et_compactness_mean.setText(s.getString("c", ""));
+            et_concavity_mean.setText(s.getString("co", ""));
+            et_concave_points_mean.setText(s.getString("cp", ""));
+            et_symmetry_mean.setText(s.getString("sy", ""));
+            et_fractal_dimension_mean.setText(s.getString("f", ""));
+        }
+
+        // Load model
         try {
             tflite = new Interpreter(FileUtil.loadMappedFile(this, MODEL_FILE));
         } catch (IOException e) {
-            Log.e(TAG, "Model load failed", e);
-            Toast.makeText(this, "Model load failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Model load failed", Toast.LENGTH_LONG).show();
             return;
         }
 
+        // Upload
+        btnUploadReport.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("*/*");
+            intent.putExtra(Intent.EXTRA_MIME_TYPES,
+                    new String[]{"image/*", "application/pdf"});
+            startActivityForResult(intent, 100);
+        });
+
+
+
+
+
+
+        // ✅ OCR APPLY ONLY ON FIRST LOAD
+        if (DataHolder.hasData) {
+
+            float[] v = DataHolder.ocrValues;
+
+            setIfEmpty(et_radius_mean, v[0]);
+            setIfEmpty(et_texture_mean, v[1]);
+            setIfEmpty(et_perimeter_mean, v[2]);
+            setIfEmpty(et_area_mean, v[3]);
+            setIfEmpty(et_smoothness_mean, v[4]);
+            setIfEmpty(et_compactness_mean, v[5]);
+            setIfEmpty(et_concavity_mean, v[6]);
+            setIfEmpty(et_concave_points_mean, v[7]);
+            setIfEmpty(et_symmetry_mean, v[8]);
+            setIfEmpty(et_fractal_dimension_mean, v[9]);
+
+            DataHolder.hasData = false; // only once
+        }
+
+
+
+        // Predict
         btnPredictForm.setOnClickListener(v -> {
-            float[] raw30 = buildRaw30Array();
-            if (raw30 == null) return;
 
-            // standardize -> scaled inputs for model
+            float[] raw = buildRaw30Array();
+            if (raw == null) return;
+
             float[] scaled = new float[30];
-            for (int i = 0; i < 30; i++) scaled[i] = (raw30[i] - MEAN[i]) / STD[i];
+            for (int x = 0; x < 30; x++) {
+                scaled[x] = (raw[x] - MEAN[x]) / STD[x];
+            }
 
-            float probability = runModelAndGetProbability(scaled);
+            float prob = runModel(scaled);
+            String label = prob >= 0.5f ? "Malignant" : "Benign";
 
-            // label inference
-            String label = probability >= 0.5f ? "Malignant" : "Benign";
-
-            // SAVE prediction to Supabase (background)
-            savePredictionToSupabase(raw30, probability, label);
-
-            // show result
-            Intent intent = new Intent(FormPredictionActivity.this, ResultActivity.class);
-            intent.putExtra("result_score", probability);
+            Intent intent = new Intent(this, ResultActivity.class);
+            intent.putExtra("result_score", prob);
             intent.putExtra("result_label", label);
+            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
+              // 🔥 THIS LINE FIXES EVERYTHING
         });
     }
 
-    /**
-     * Build a raw 30-length feature vector:
-     * - first 10 parsed from UI
-     * - remaining 20 filled with dataset MEAN (so standardized -> 0)
-     */
-    private float[] buildRaw30Array() {
-        float[] raw = new float[30];
-        try {
-            raw[0] = Float.parseFloat(et_radius_mean.getText().toString().trim());
-            raw[1] = Float.parseFloat(et_texture_mean.getText().toString().trim());
-            raw[2] = Float.parseFloat(et_perimeter_mean.getText().toString().trim());
-            raw[3] = Float.parseFloat(et_area_mean.getText().toString().trim());
-            raw[4] = Float.parseFloat(et_smoothness_mean.getText().toString().trim());
-            raw[5] = Float.parseFloat(et_compactness_mean.getText().toString().trim());
-            raw[6] = Float.parseFloat(et_concavity_mean.getText().toString().trim());
-            raw[7] = Float.parseFloat(et_concave_points_mean.getText().toString().trim());
-            raw[8] = Float.parseFloat(et_symmetry_mean.getText().toString().trim());
-            raw[9] = Float.parseFloat(et_fractal_dimension_mean.getText().toString().trim());
-        } catch (Exception e) {
-            Toast.makeText(this, "Please enter valid values for all 10 fields.", Toast.LENGTH_SHORT).show();
-            return null;
-        }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
 
-        for (int i = 10; i < 30; i++) raw[i] = MEAN[i]; // use dataset mean
-        return raw;
+        // if no previous activity → go to home
+        if (isTaskRoot()) {
+            startActivity(new Intent(this, HomeActivity.class));
+            finish();
+        }
+    }
+    private void setIfEmpty(EditText et, float value) {
+        if (et.getText().toString().trim().isEmpty()) {
+            et.setText(String.valueOf(value));
+        }
     }
 
-    /**
-     * Runs model and returns probability (0..1) for "malignant".
-     * Supports single-output or two-output model outputs.
-     */
-    private float runModelAndGetProbability(float[] scaledInput) {
-        try {
-            // prepare input buffer
-            ByteBuffer inputBuffer = ByteBuffer.allocateDirect(30 * 4);
-            inputBuffer.order(ByteOrder.nativeOrder());
-            for (float v : scaledInput) inputBuffer.putFloat(v);
-            inputBuffer.rewind();
+    // SAVE STATE
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-            int[] outShape = tflite.getOutputTensor(0).shape();
-            int outDim = outShape[outShape.length - 1];
+        outState.putString("r", et_radius_mean.getText().toString());
+        outState.putString("t", et_texture_mean.getText().toString());
+        outState.putString("p", et_perimeter_mean.getText().toString());
+        outState.putString("a", et_area_mean.getText().toString());
+        outState.putString("s", et_smoothness_mean.getText().toString());
+        outState.putString("c", et_compactness_mean.getText().toString());
+        outState.putString("co", et_concavity_mean.getText().toString());
+        outState.putString("cp", et_concave_points_mean.getText().toString());
+        outState.putString("sy", et_symmetry_mean.getText().toString());
+        outState.putString("f", et_fractal_dimension_mean.getText().toString());
+    }
 
-            if (outDim == 1) {
-                float[][] out = new float[1][1];
-                tflite.run(inputBuffer, out);
-                float val = out[0][0];
-                // if val outside [0,1] -> apply sigmoid
-                if (val < 0f || val > 1f) val = sigmoid(val);
-                return val;
-            } else {
-                float[][] out = new float[1][outDim];
-                tflite.run(inputBuffer, out);
-                float[] scores = out[0];
-                float[] soft = softmax(scores);
-                // assume index 1 = malignant
-                return soft.length >= 2 ? soft[1] : soft[soft.length - 1];
+    private void setIfPresent(Intent i, String key, EditText et) {
+        if (i.hasExtra(key)) {
+            float v = i.getFloatExtra(key, -1f);
+            if (v > 0 && et.getText().toString().trim().isEmpty()) {
+                et.setText(String.valueOf(v));
             }
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent); // 🔥 THIS STOPS RESET
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Upload image
+        if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            String type = getContentResolver().getType(uri);
+
+            if (type != null && type.equals("application/pdf")) {
+                Toast.makeText(this, "PDF selected", Toast.LENGTH_SHORT).show();
+            } else {
+                Intent intent = new Intent(this, OCRReportActivity.class);
+                intent.setData(uri);
+                startActivity(intent);
+            }
+        }
+
+
+
+    }
+
+    private float safeParse(EditText et) {
+
+        String val = et.getText().toString().trim();
+
+        // remove OCR garbage
+        val = val.replaceAll("[^0-9.]", "");
+
+        if (val.isEmpty() || val.equals(".")) {
+            return -1f; // ❌ DO NOT CRASH
+        }
+
+        try {
+            return Float.parseFloat(val);
         } catch (Exception e) {
-            Log.e(TAG, "Model run failed", e);
-            Toast.makeText(this, "Prediction failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            return -1f; // ❌ DO NOT CRASH
+        }
+    }
+
+    private float[] buildRaw30Array() {
+        try {
+            float[] raw = new float[30];
+
+            raw[0] = safeParse(et_radius_mean);
+            raw[1] = safeParse(et_texture_mean);
+            raw[2] = safeParse(et_perimeter_mean);
+            raw[3] = safeParse(et_area_mean);
+            raw[4] = safeParse(et_smoothness_mean);
+            raw[5] = safeParse(et_compactness_mean);
+            raw[6] = safeParse(et_concavity_mean);
+            raw[7] = safeParse(et_concave_points_mean);
+            raw[8] = safeParse(et_symmetry_mean);
+            raw[9] = safeParse(et_fractal_dimension_mean);
+
+            // 🔥 VALIDATION (VERY IMPORTANT)
+            for (int i = 0; i < 10; i++) {
+                if (raw[i] == -1f) {
+                    Toast.makeText(this, "Invalid input detected!", Toast.LENGTH_SHORT).show();
+                    return null;
+                }
+            }
+
+            for (int i = 10; i < 30; i++) raw[i] = MEAN[i];
+
+            return raw;
+
+        } catch (Exception e) {
+            Toast.makeText(this, "Fix invalid values!", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+    }
+
+    private float runModel(float[] scaled) {
+
+        try {
+            float[][] input = new float[1][30];
+
+            for (int i = 0; i < 30; i++) {
+                input[0][i] = scaled[i];
+            }
+
+            // ✅ CORRECT OUTPUT SHAPE
+            float[][] output = new float[1][2];
+
+            tflite.run(input, output);
+
+            // 🔥 IMPORTANT: take malignant probability
+            return output[0][1];
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Model crash: " + e.getMessage(), Toast.LENGTH_LONG).show();
             return 0f;
         }
     }
-
-    private float sigmoid(float x) {
-        return (float) (1.0 / (1.0 + Math.exp(-x)));
-    }
-
-    private float[] softmax(float[] logits) {
-        double max = Double.NEGATIVE_INFINITY;
-        for (float v : logits) if (v > max) max = v;
-        double sum = 0.0;
-        double[] exps = new double[logits.length];
-        for (int i = 0; i < logits.length; i++) {
-            exps[i] = Math.exp(logits[i] - max);
-            sum += exps[i];
-        }
-        float[] out = new float[logits.length];
-        for (int i = 0; i < logits.length; i++) out[i] = (float) (exps[i] / sum);
-        return out;
-    }
-
-    /**
-     * Save prediction to Supabase using your SupabaseClient (OkHttp-based).
-     * Sends raw feature values (not standardized) so DB columns show actual measurements.
-     */
-    private void savePredictionToSupabase(final float[] rawFeatures, final float probability, final String label) {
-        new Thread(() -> {
-            try {
-                JsonObject json = new JsonObject();
-                // add all 30 features
-                for (int i = 0; i < FEATURE_NAMES.length; i++) {
-                    json.addProperty(FEATURE_NAMES[i], rawFeatures[i]);
-                }
-                json.addProperty("result", label);
-                json.addProperty("probability", probability);
-
-                // session manager to retrieve token (you already use this elsewhere)
-                SessionManager sm = new SessionManager(FormPredictionActivity.this);
-                String token = sm.getToken();
-                if (token == null || token.trim().isEmpty()) {
-                    runOnUiThread(() -> Toast.makeText(FormPredictionActivity.this, "Not logged in — prediction not saved.", Toast.LENGTH_SHORT).show());
-                    return;
-                }
-
-                String userId = SupabaseClient.getUserIdFromToken(token);
-                if (userId != null) json.addProperty("user_id", userId);
-
-                boolean ok = SupabaseClient.insertPrediction(json, token);
-                runOnUiThread(() -> Toast.makeText(FormPredictionActivity.this, ok ? "Prediction saved" : "Failed to save prediction", Toast.LENGTH_SHORT).show());
-            } catch (Exception e) {
-                Log.e(TAG, "Error saving prediction", e);
-                runOnUiThread(() -> Toast.makeText(FormPredictionActivity.this, "Error saving prediction", Toast.LENGTH_SHORT).show());
-            }
-        }).start();
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

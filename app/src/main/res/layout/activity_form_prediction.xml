@@ -50,6 +50,13 @@
             <EditText android:id="@+id/et_fractal_dimension_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Fractal Dimension Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
 
         </LinearLayout>
+        <Button
+            android:id="@+id/btnUploadReport"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Upload Report (Image)"
+            android:layout_marginTop="12dp"/>
+
 
         <Button
             android:id="@+id/btnPredictForm"

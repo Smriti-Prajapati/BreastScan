@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF5F8"
+    android:padding="20dp"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- TITLE -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Terms &amp; Conditions"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#C2185B"
+            android:gravity="center"
+            android:layout_marginBottom="10dp"/>
+
+        <!-- DATE -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Effective Date: 2026"
+            android:textSize="13sp"
+            android:textColor="#777777"
+            android:gravity="center"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- CONTENT -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="These Terms and Conditions apply to the BreastScan mobile application developed by Smriti Prajapati and provided as a free service.\n\nBy downloading or using this Application, you agree to these Terms. Please read them carefully.\n\n1. Use of the Application\n\nBreastScan provides AI-based predictions using user input. The app is intended for informational purposes only.\n\n2. Medical Disclaimer\n\nBreastScan does NOT provide medical advice. Always consult a qualified doctor for medical decisions.\n\n3. Restrictions\n\nYou may NOT copy, modify, reverse engineer, or misuse the application in any way.\n\n4. User Responsibility\n\nYou are responsible for providing accurate information and maintaining device security.\n\n5. Internet Usage\n\nSome features require internet. We are not responsible for network issues or data charges.\n\n6. Limitation of Liability\n\nThe developer is not responsible for decisions taken based on app predictions.\n\n7. Updates\n\nWe may update or modify the app at any time.\n\n8. Contact\n\nDeveloper: Smriti Prajapati\nEmail: smritiprajapati15@gmail.com"
+            android:textSize="15sp"
+            android:textColor="#333333"
+            android:lineSpacingExtra="6dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp"/>
+
+    </LinearLayout>
+</ScrollView>

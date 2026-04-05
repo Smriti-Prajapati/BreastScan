@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF1F4"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <!-- Main Card -->
+    <LinearLayout
+        android:id="@+id/cardQuestion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:elevation="8dp"
+        android:padding="24dp">
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quick Self Check"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#C2185B"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Question -->
+        <TextView
+            android:id="@+id/tvQuestion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Question"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- Age Input -->
+        <EditText
+            android:id="@+id/etAge"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Enter your age"
+            android:inputType="number"
+            android:visibility="gone"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- YES/NO Buttons -->
+        <LinearLayout
+            android:id="@+id/btnLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnYes"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="YES"
+                android:background="@drawable/btn_bg"
+                android:textColor="#FFFFFF"/>
+
+            <Button
+                android:id="@+id/btnNo"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="NO"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/btn_bg"
+                android:textColor="#FFFFFF"/>
+        </LinearLayout>
+
+        <!-- Next Button -->
+        <Button
+            android:id="@+id/btnNext"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Next"
+            android:visibility="gone"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/btn_bg"
+            android:textColor="#FFFFFF"/>
+
+    </LinearLayout>
+
+    <!-- Result Card -->
+    <TextView
+        android:id="@+id/tvResult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginTop="20dp"
+        android:padding="20dp"
+        android:background="@drawable/card_bg"
+        android:textSize="16sp"
+        android:lineSpacingExtra="4dp"/>
+
+    <Button
+        android:id="@+id/btnHospital"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:text="Find Nearby Hospitals"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/btn_bg"
+        android:textColor="#FFFFFF"
+        android:visibility="gone"/>
+
+</LinearLayout>

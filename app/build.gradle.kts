@@ -6,6 +6,7 @@ android {
     namespace = "com.example.breastscan"
     compileSdk = 35
 
+
     defaultConfig {
         applicationId = "com.example.breastscan"
         minSdk = 24
@@ -14,6 +15,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    aaptOptions {
+        noCompress += "tflite"
     }
 
     buildTypes {
@@ -42,8 +47,12 @@ dependencies {
     // AndroidX + UI
     implementation("androidx.appcompat:appcompat:1.7.0")
 
+
+
     // ✔ KEEP ONLY ONE MATERIAL VERSION (LATEST)
     implementation("com.google.android.material:material:1.12.0")
+    implementation("com.google.mlkit:text-recognition:16.0.0")
+
 
     implementation("androidx.constraintlayout:constraintlayout:2.2.0")
     implementation("androidx.core:core-ktx:1.13.1")

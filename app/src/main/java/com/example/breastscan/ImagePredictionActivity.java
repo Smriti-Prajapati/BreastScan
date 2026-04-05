@@ -9,7 +9,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -36,18 +35,31 @@ public class ImagePredictionActivity extends AppCompatActivity {
         btnCamera = findViewById(R.id.btnCamera);
         btnPredict = findViewById(R.id.btnPredict);
 
+        // Upload from gallery
         btnUpload.setOnClickListener(v -> pickImage.launch("image/*"));
+
+        // Open camera
         btnCamera.setOnClickListener(v -> openCamera());
+
+        // Predict
         btnPredict.setOnClickListener(v -> {
-            if (selectedBitmap == null) {
-                Toast.makeText(this, "Please upload or capture an image first!", Toast.LENGTH_SHORT).show();
-            } else {
-                // Placeholder - implement your image model prediction here.
-                Toast.makeText(this, "Prediction feature coming soon!", Toast.LENGTH_SHORT).show();
+            try {
+                TFLiteHelper helper = new TFLiteHelper(this);
+                String result = helper.predict(selectedBitmap);
+
+                // ✅ OPEN NEW RESULT SCREEN
+                Intent intent = new Intent(ImagePredictionActivity.this, ImageResultActivity.class);
+                intent.putExtra("result", result);
+                startActivity(intent);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Error running model!", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    // Image picker
     ActivityResultLauncher<String> pickImage =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
@@ -60,6 +72,7 @@ public class ImagePredictionActivity extends AppCompatActivity {
                 }
             });
 
+    // Camera
     private void openCamera() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.CAMERA)

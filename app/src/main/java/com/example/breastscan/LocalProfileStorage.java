@@ -5,53 +5,66 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileInputStream;
 
 public class LocalProfileStorage {
 
-    private static final String PREF = "local_profile_pref";
-    private static final String KEY_AGE = "age";
-    private static final String KEY_BLOOD = "blood";
-    private static final String KEY_HISTORY = "history";
-    private static final String KEY_BMI = "bmi";
+    private static final String PREF_NAME = "UserProfile";
 
-    private static final String PHOTO_FILENAME = "profile_photo.png";
+    // 🔹 SAVE TEXT DATA
+    public static void saveProfileFields(Context context, String age, String blood, String history, String bmi) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
 
-    public static void saveProfileFields(Context ctx, String age, String blood, String history, String bmi) {
-        SharedPreferences sp = ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE);
-        sp.edit()
-                .putString(KEY_AGE, age)
-                .putString(KEY_BLOOD, blood)
-                .putString(KEY_HISTORY, history)
-                .putString(KEY_BMI, bmi)
-                .apply();
+        editor.putString("age", age);
+        editor.putString("blood", blood);
+        editor.putString("history", history);
+        editor.putString("bmi", bmi);
+
+        editor.apply();
     }
 
-    public static String getAge(Context ctx) { return ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_AGE, ""); }
-    public static String getBlood(Context ctx) { return ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_BLOOD, ""); }
-    public static String getHistory(Context ctx) { return ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_HISTORY, ""); }
-    public static String getBmi(Context ctx) { return ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_BMI, ""); }
+    // 🔹 GET DATA
+    public static String getAge(Context c) {
+        return c.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).getString("age", "");
+    }
 
-    public static void savePhotoBitmap(Context ctx, Bitmap bmp) {
+    public static String getBlood(Context c) {
+        return c.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).getString("blood", "");
+    }
+
+    public static String getHistory(Context c) {
+        return c.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).getString("history", "");
+    }
+
+    public static String getBmi(Context c) {
+        return c.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).getString("bmi", "");
+    }
+
+    // 🔹 SAVE IMAGE
+    public static void savePhotoBitmap(Context context, Bitmap bitmap) {
         try {
-            File file = new File(ctx.getFilesDir(), PHOTO_FILENAME);
-            FileOutputStream fos = new FileOutputStream(file);
-            bmp.compress(Bitmap.CompressFormat.PNG, 90, fos);
+            FileOutputStream fos = context.openFileOutput("profile.jpg", Context.MODE_PRIVATE);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.close();
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public static Bitmap getPhotoBitmap(Context ctx) {
+    // 🔹 LOAD IMAGE
+    public static Bitmap getPhotoBitmap(Context context) {
         try {
-            File file = new File(ctx.getFilesDir(), PHOTO_FILENAME);
-            if (!file.exists()) return null;
-            return BitmapFactory.decodeFile(file.getAbsolutePath());
-        } catch (Exception e) { return null; }
+            FileInputStream fis = context.openFileInput("profile.jpg");
+            return BitmapFactory.decodeStream(fis);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
-    public static void removePhoto(Context ctx) {
-        File file = new File(ctx.getFilesDir(), PHOTO_FILENAME);
-        if (file.exists()) file.delete();
+    // 🔹 REMOVE IMAGE
+    public static void removePhoto(Context context) {
+        context.deleteFile("profile.jpg");
     }
 }

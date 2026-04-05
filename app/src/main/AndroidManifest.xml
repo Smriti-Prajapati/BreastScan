@@ -8,6 +8,7 @@
     <!-- For Camera -->
     <uses-permission android:name="android.permission.CAMERA" />
 
+
     <!-- Android 13+ (Tiramisu) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
@@ -32,6 +33,8 @@
         android:theme="@style/Theme.BreastScan"
         tools:ignore="WrongManifestParent">
 
+        <activity android:name=".OCRReportActivity" />
+
         <!-- REQUIRED for camera file handling -->
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -44,13 +47,33 @@
         </provider>
 
         <!-- Activities -->
-        <activity android:name=".ResultActivity" />
+
         <activity android:name=".ImagePredictionActivity" />
-        <activity android:name=".FormPredictionActivity" />
+
         <activity android:name=".ProfileActivity" />
         <activity android:name=".HomeActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" />
+        <activity android:name=".ImageResultActivity" />
+        
+
+        <activity
+            android:name=".FormPredictionActivity"
+            android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize" />
+
+        <activity android:name=".ChatbotActivity"/>
+
+        <activity android:name=".InfoActivity"/>
+
+        <activity android:name=".TermsActivity"/>
+
+        <activity android:name=".PrivacyActivity"/>
+
+
+
+        <activity android:name=".ResultActivity"
+            android:launchMode="singleTop"/>
 
         <!-- Launcher Activity -->
         <activity
