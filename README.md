@@ -68,7 +68,7 @@ app/
 ### Steps
 
 ```bash
-git clone <your-repo-link>
+git clone https://github.com/Smriti-Prajapati/BreastScan.git
 cd BreastScan
 ```
 
