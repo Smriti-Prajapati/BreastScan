@@ -32,10 +32,53 @@ Android App (MedicalQAActivity)
 
 | File | Purpose |
 |---|---|
+| `app.py` | Streamlit web UI (file uploader, question input, answer display) |
 | `backend.py` | Flask REST API (`/upload`, `/ask`, `/health`) |
 | `rag_pipeline.py` | PDF parsing, chunking, embedding, retrieval, LLM call |
 | `requirements.txt` | All Python dependencies |
 | `README.md` | This file |
+
+---
+
+## How to Install Dependencies
+
+```bash
+cd medical_qa
+pip install -r requirements.txt
+```
+
+---
+
+## How to Run
+
+You need **two terminals** running simultaneously.
+
+### Terminal 1 — Flask Backend
+
+```bash
+python backend.py
+```
+
+Server starts at `http://localhost:5000`
+
+### Terminal 2 — Streamlit Frontend
+
+```bash
+streamlit run app.py
+```
+
+Browser opens automatically at `http://localhost:8501`
+
+---
+
+## How to Use
+
+1. Open the Streamlit UI in your browser
+2. Upload a medical PDF using the file uploader
+3. Click **Process PDF** and wait for chunking/embedding to complete
+4. Type your question in the text input
+5. Click **Get Answer**
+6. The answer and its source page citation are displayed below
 
 ---
 
