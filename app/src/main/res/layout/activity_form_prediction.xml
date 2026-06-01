@@ -1,72 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF1F4"
+    android:background="@color/colorBackground"
     android:fillViewport="true">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="20dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Form-Based Prediction"
+            android:text="Form Prediction"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="#C2185B"
-            android:padding="10dp"
-            android:layout_gravity="center_horizontal" />
+            android:textColor="@color/pinkPrimary"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="20dp" />
 
-        <LinearLayout
+        <!-- Input card -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp"
-            android:background="@android:color/white"
-            android:elevation="4dp">
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            android:layout_marginBottom="16dp">
 
-            <EditText android:id="@+id/et_radius_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Radius Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <EditText android:id="@+id/et_texture_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Texture Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Clinical Measurements"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorTextBrand"
+                    android:layout_marginBottom="16dp" />
 
-            <EditText android:id="@+id/et_perimeter_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Perimeter Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
+                <EditText android:id="@+id/et_radius_mean"        android:layout_width="match_parent" android:layout_height="52dp" android:hint="Radius Mean"            android:inputType="numberDecimal" android:padding="14dp" android:background="@drawable/edittext_bg" android:textColor="@color/colorTextPrimary" android:textColorHint="@color/colorTextHint" android:layout_marginBottom="10dp"/>
+                <EditText android:id="@+id/et_texture_mean"       android:layout_width="match_parent" android:layout_height="52dp" android:hint="Texture Mean"           android:inputType="numberDecimal" android:padding="14dp" android:background="@drawable/edittext_bg" android:textColor="@color/colorTextPrimary" android:textColorHint="@color/colorTextHint" android:layout_marginBottom="10dp"/>
+                <EditText android:id="@+id/et_perimeter_mean"     android:layout_width="match_parent" android:layout_height="52dp" android:hint="Perimeter Mean"         android:inputType="numberDecimal" android:padding="14dp" android:background="@drawable/edittext_bg" android:textColor="@color/colorTextPrimary" android:textColorHint="@color/colorTextHint" android:layout_marginBottom="10dp"/>
+                <EditText android:id="@+id/et_area_mean"          android:layout_width="match_parent" android:layout_height="52dp" android:hint="Area Mean"              android:inputType="numberDecimal" android:padding="14dp" android:background="@drawable/edittext_bg" android:textColor="@color/colorTextPrimary" android:textColorHint="@color/colorTextHint" android:layout_marginBottom="10dp"/>
+                <EditText android:id="@+id/et_smoothness_mean"    android:layout_width="match_parent" android:layout_height="52dp" android:hint="Smoothness Mean"        android:inputType="numberDecimal" android:padding="14dp" android:background="@drawable/edittext_bg" android:textColor="@color/colorTextPrimary" android:textColorHint="@color/colorTextHint" android:layout_marginBottom="10dp"/>
+                <EditText android:id="@+id/et_compactness_mean"   android:layout_width="match_parent" android:layout_height="52dp" android:hint="Compactness Mean"       android:inputType="numberDecimal" android:padding="14dp" android:background="@drawable/edittext_bg" android:textColor="@color/colorTextPrimary" android:textColorHint="@color/colorTextHint" android:layout_marginBottom="10dp"/>
+                <EditText android:id="@+id/et_concavity_mean"     android:layout_width="match_parent" android:layout_height="52dp" android:hint="Concavity Mean"         android:inputType="numberDecimal" android:padding="14dp" android:background="@drawable/edittext_bg" android:textColor="@color/colorTextPrimary" android:textColorHint="@color/colorTextHint" android:layout_marginBottom="10dp"/>
+                <EditText android:id="@+id/et_concave_points_mean" android:layout_width="match_parent" android:layout_height="52dp" android:hint="Concave Points Mean"   android:inputType="numberDecimal" android:padding="14dp" android:background="@drawable/edittext_bg" android:textColor="@color/colorTextPrimary" android:textColorHint="@color/colorTextHint" android:layout_marginBottom="10dp"/>
+                <EditText android:id="@+id/et_symmetry_mean"      android:layout_width="match_parent" android:layout_height="52dp" android:hint="Symmetry Mean"          android:inputType="numberDecimal" android:padding="14dp" android:background="@drawable/edittext_bg" android:textColor="@color/colorTextPrimary" android:textColorHint="@color/colorTextHint" android:layout_marginBottom="10dp"/>
+                <EditText android:id="@+id/et_fractal_dimension_mean" android:layout_width="match_parent" android:layout_height="52dp" android:hint="Fractal Dimension Mean" android:inputType="numberDecimal" android:padding="14dp" android:background="@drawable/edittext_bg" android:textColor="@color/colorTextPrimary" android:textColorHint="@color/colorTextHint"/>
 
-            <EditText android:id="@+id/et_area_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Area Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-            <EditText android:id="@+id/et_smoothness_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Smoothness Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
-
-            <EditText android:id="@+id/et_compactness_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Compactness Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
-
-            <EditText android:id="@+id/et_concavity_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Concavity Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
-
-            <EditText android:id="@+id/et_concave_points_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Concave Points Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
-
-            <EditText android:id="@+id/et_symmetry_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Symmetry Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
-
-            <EditText android:id="@+id/et_fractal_dimension_mean" android:layout_width="match_parent" android:layout_height="55dp" android:hint="Fractal Dimension Mean" android:inputType="numberDecimal" android:padding="12dp" android:layout_marginTop="8dp"/>
-
-        </LinearLayout>
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnUploadReport"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Upload Report (Image)"
-            android:layout_marginTop="12dp"/>
+            android:layout_height="54dp"
+            android:text="Upload Report Image"
+            android:textAllCaps="false"
+            android:textColor="@color/pinkPrimary"
+            android:layout_marginBottom="12dp"
+            app:cornerRadius="16dp"
+            app:backgroundTint="@color/colorSurfaceVariant"
+            app:strokeColor="@color/pinkPrimary"
+            app:strokeWidth="1.5dp" />
 
-
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnPredictForm"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="54dp"
             android:text="Predict"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/btn_bg"
-            android:textColor="#FFFFFF" />
+            android:textAllCaps="false"
+            android:textColor="@color/colorTextOnPrimary"
+            android:layout_marginBottom="28dp"
+            app:cornerRadius="16dp"
+            app:backgroundTint="@color/pinkPrimary" />
 
     </LinearLayout>
 </ScrollView>

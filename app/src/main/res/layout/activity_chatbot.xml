@@ -1,114 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF1F4"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="16dp">
+    android:background="@color/colorBackground"
+    android:fillViewport="true">
 
-    <!-- Main Card -->
     <LinearLayout
-        android:id="@+id/cardQuestion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@android:color/white"
-        android:elevation="8dp"
-        android:padding="24dp">
+        android:padding="20dp"
+        android:gravity="center_horizontal">
 
-        <!-- Title -->
+        <!-- Screen title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Quick Self Check"
-            android:textSize="20sp"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="#C2185B"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp"/>
+            android:textColor="@color/pinkPrimary"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="20dp" />
 
-        <!-- Question -->
-        <TextView
-            android:id="@+id/tvQuestion"
+        <!-- Question Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardQuestion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Question"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="20dp"/>
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            android:layout_marginBottom="16dp">
 
-        <!-- Age Input -->
-        <EditText
-            android:id="@+id/etAge"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="Enter your age"
-            android:inputType="number"
-            android:visibility="gone"
-            android:layout_marginBottom="20dp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
 
-        <!-- YES/NO Buttons -->
-        <LinearLayout
-            android:id="@+id/btnLayout"
+                <TextView
+                    android:id="@+id/tvQuestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Question"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorTextPrimary"
+                    android:gravity="center"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Age Input -->
+                <EditText
+                    android:id="@+id/etAge"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:hint="Enter your age"
+                    android:inputType="number"
+                    android:visibility="gone"
+                    android:background="@drawable/edittext_bg"
+                    android:padding="14dp"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textColorHint="@color/colorTextHint"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- YES / NO -->
+                <LinearLayout
+                    android:id="@+id/btnLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnYes"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:text="YES"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextOnPrimary"
+                        app:cornerRadius="14dp"
+                        app:backgroundTint="@color/pinkPrimary" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnNo"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:text="NO"
+                        android:textAllCaps="false"
+                        android:textColor="@color/pinkPrimary"
+                        app:cornerRadius="14dp"
+                        app:backgroundTint="@color/colorSurfaceVariant"
+                        app:strokeColor="@color/pinkPrimary"
+                        app:strokeWidth="1.5dp" />
+                </LinearLayout>
+
+                <!-- Next Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnNext"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="Next"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorTextOnPrimary"
+                    android:visibility="gone"
+                    android:layout_marginTop="16dp"
+                    app:cornerRadius="14dp"
+                    app:backgroundTint="@color/pinkPrimary" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Result — TextView id kept as tvResult for Java compatibility -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            android:layout_marginBottom="16dp">
 
-            <Button
-                android:id="@+id/btnYes"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:text="YES"
-                android:background="@drawable/btn_bg"
-                android:textColor="#FFFFFF"/>
+            <TextView
+                android:id="@+id/tvResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:padding="24dp"
+                android:textSize="15sp"
+                android:textColor="@color/colorTextPrimary"
+                android:lineSpacingExtra="5dp" />
+        </androidx.cardview.widget.CardView>
 
-            <Button
-                android:id="@+id/btnNo"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:text="NO"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/btn_bg"
-                android:textColor="#FFFFFF"/>
-        </LinearLayout>
-
-        <!-- Next Button -->
-        <Button
-            android:id="@+id/btnNext"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnHospital"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="Next"
+            android:layout_height="54dp"
+            android:text="Find Nearby Hospitals"
+            android:textAllCaps="false"
+            android:textColor="@color/colorTextOnPrimary"
+            android:layout_marginBottom="24dp"
             android:visibility="gone"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/btn_bg"
-            android:textColor="#FFFFFF"/>
+            app:cornerRadius="16dp"
+            app:backgroundTint="@color/pinkPrimary" />
 
     </LinearLayout>
-
-    <!-- Result Card -->
-    <TextView
-        android:id="@+id/tvResult"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_marginTop="20dp"
-        android:padding="20dp"
-        android:background="@drawable/card_bg"
-        android:textSize="16sp"
-        android:lineSpacingExtra="4dp"/>
-
-    <Button
-        android:id="@+id/btnHospital"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:text="Find Nearby Hospitals"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/btn_bg"
-        android:textColor="#FFFFFF"
-        android:visibility="gone"/>
-
-</LinearLayout>
+</ScrollView>

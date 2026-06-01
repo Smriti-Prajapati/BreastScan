@@ -1,19 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Brand Pink (slightly lighter for dark mode) -->
-    <color name="pinkPrimary">#FF8AB1</color>
-    <color name="pinkDark">#FF5C8A</color>
-    <color name="pinkLight">#2A2A2A</color>
+    <!-- ── Brand pinks — slightly lighter so they pop on dark bg ── -->
+    <color name="pinkPrimary">#E91E63</color>
+    <color name="pinkDark">#C2185B</color>
+    <color name="pinkAccent">#F06292</color>
+    <color name="pinkLight">#2C1A22</color>
+    <color name="pink">#E91E63</color>
 
-    <!-- Required Colors -->
-    <color name="background">#121212</color>
+    <!-- ── Semantic surface tokens (dark mode) ── -->
+    <color name="colorBackground">#0F0F0F</color>
+    <color name="colorSurface">#1E1E1E</color>
+    <color name="colorSurfaceVariant">#2A1A22</color>
+    <color name="colorCardBackground">#1E1E1E</color>
+    <color name="colorDrawerBackground">#1A1A1A</color>
+    <color name="colorInputBackground">#2A2A2A</color>
+    <color name="colorDivider">#333333</color>
+    <color name="colorHeaderBackground">#880E4F</color>
+
+    <!-- ── Semantic text tokens (dark mode) ── -->
+    <color name="colorTextPrimary">#F0F0F0</color>
+    <color name="colorTextSecondary">#BBBBBB</color>
+    <color name="colorTextHint">#777777</color>
+    <color name="colorTextOnPrimary">#FFFFFF</color>
+    <color name="colorTextBrand">#F06292</color>
+
+    <!-- ── Status colors ── -->
+    <color name="green_dark">#66BB6A</color>
+    <color name="red_dark">#EF5350</color>
+    <color name="colorSuccess">#66BB6A</color>
+    <color name="colorError">#EF5350</color>
+    <color name="colorWarning">#FFB300</color>
+
+    <!-- ── Legacy aliases ── -->
+    <color name="background">#0F0F0F</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-
-
-    <color name="pinkBackground">#FFF1F4</color>
-
-
+    <color name="pinkBackground">#2A1A22</color>
 
 </resources>

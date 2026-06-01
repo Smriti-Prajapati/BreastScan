@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <!-- Dark mode overrides — inherits everything from light theme,
+         only overrides what needs to change. Colors are already
+         handled by values-night/colors.xml. -->
     <style name="Theme.BreastScan" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-
-        <!-- Background + Surface -->
-        <item name="android:colorBackground">@color/background</item>
-        <item name="colorSurface">@color/pinkLight</item>
-        <item name="colorOnSurface">@color/white</item>
-
-        <!-- Brand Colors -->
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorTextPrimary</item>
         <item name="colorPrimary">@color/pinkPrimary</item>
         <item name="colorPrimaryVariant">@color/pinkDark</item>
-        <item name="colorSecondary">@color/pinkLight</item>
-
-        <!-- Text -->
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="colorOnSecondary">@color/white</item>
-
-        <!-- Status bar -->
-        <item name="android:statusBarColor">@color/background</item>
-        <item name="android:navigationBarColor">@color/background</item>
-
+        <item name="colorSecondary">@color/pinkAccent</item>
+        <item name="colorOnPrimary">@color/colorTextOnPrimary</item>
+        <item name="android:textColor">@color/colorTextPrimary</item>
+        <item name="android:textColorPrimary">@color/colorTextPrimary</item>
+        <item name="android:textColorSecondary">@color/colorTextSecondary</item>
+        <item name="android:textColorHint">@color/colorTextHint</item>
+        <item name="android:statusBarColor">@color/colorHeaderBackground</item>
+        <item name="android:navigationBarColor">@color/colorBackground</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="colorControlHighlight">#33E91E63</item>
+        <item name="textInputStyle">@style/CustomTextInputStyle</item>
+        <item name="materialButtonStyle">@style/AppButton</item>
+        <item name="materialCardViewStyle">@style/AppCard</item>
     </style>
-
 </resources>

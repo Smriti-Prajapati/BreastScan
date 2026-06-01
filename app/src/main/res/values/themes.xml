@@ -3,45 +3,118 @@
 
     <style name="Theme.BreastScan" parent="Theme.MaterialComponents.DayNight.NoActionBar">
 
-        <!-- Background Colors -->
-        <item name="android:colorBackground">@color/background</item>
-        <item name="colorSurface">@color/white</item>
-        <item name="colorOnSurface">@color/black</item>
+        <!-- Backgrounds -->
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorTextPrimary</item>
 
-        <!-- Primary App Colors -->
+        <!-- Brand -->
         <item name="colorPrimary">@color/pinkPrimary</item>
         <item name="colorPrimaryVariant">@color/pinkDark</item>
-        <item name="colorSecondary">@color/pinkLight</item>
+        <item name="colorSecondary">@color/pinkAccent</item>
+        <item name="colorOnPrimary">@color/colorTextOnPrimary</item>
 
-        <!-- Text Colors -->
-        <item name="android:textColor">#000000</item>
-        <item name="android:textColorPrimary">#000000</item>
-        <item name="android:textColorSecondary">#444444</item>
+        <!-- Text -->
+        <item name="android:textColor">@color/colorTextPrimary</item>
+        <item name="android:textColorPrimary">@color/colorTextPrimary</item>
+        <item name="android:textColorSecondary">@color/colorTextSecondary</item>
+        <item name="android:textColorHint">@color/colorTextHint</item>
 
-        <!-- Apply custom TextInput style -->
+        <!-- System bars -->
+        <item name="android:statusBarColor">@color/colorHeaderBackground</item>
+        <item name="android:navigationBarColor">@color/colorBackground</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Ripple -->
+        <item name="colorControlHighlight">#33C2185B</item>
+
+        <!-- TextInput -->
         <item name="textInputStyle">@style/CustomTextInputStyle</item>
 
-        <!-- System Bars -->
-        <item name="android:statusBarColor">@color/background</item>
-        <item name="android:navigationBarColor">@color/background</item>
+        <!-- MaterialButton default -->
+        <item name="materialButtonStyle">@style/AppButton</item>
+
+        <!-- Card default -->
+        <item name="materialCardViewStyle">@style/AppCard</item>
 
     </style>
 
+    <!-- ── Buttons ── -->
+    <style name="AppButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/colorTextOnPrimary</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="backgroundTint">@color/pinkPrimary</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="elevation">2dp</item>
+    </style>
 
-    <!-- Custom TextInput Layout Style -->
-    <style name="CustomTextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+    <style name="AppButton.Secondary" parent="AppButton">
+        <item name="backgroundTint">@color/pinkAccent</item>
+    </style>
 
-        <!-- FIX: Hint color (Grey, always visible, not red) -->
-        <item name="android:textColorHint">#88000000</item>
-        <item name="hintTextColor">#88000000</item>
+    <style name="AppButton.Outline" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/pinkPrimary</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="strokeColor">@color/pinkPrimary</item>
+        <item name="strokeWidth">1.5dp</item>
+    </style>
 
-        <!-- EditText inside TextInputLayout -->
-        <item name="android:editTextColor">#FF000000</item>
-        <item name="editTextColor">#FF000000</item>
+    <!-- ── Cards ── -->
+    <style name="AppCard" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="cardBackgroundColor">@color/colorCardBackground</item>
+        <item name="contentPaddingLeft">20dp</item>
+        <item name="contentPaddingTop">20dp</item>
+        <item name="contentPaddingRight">20dp</item>
+        <item name="contentPaddingBottom">20dp</item>
+    </style>
 
-        <!-- Highlight selection -->
-        <item name="android:textColorHighlight">#55000000</item>
+    <!-- ── TextInput ── -->
+    <style name="CustomTextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:textColorHint">@color/colorTextHint</item>
+        <item name="hintTextColor">@color/pinkPrimary</item>
+        <item name="boxStrokeColor">@color/pinkPrimary</item>
+        <item name="boxCornerRadiusTopStart">14dp</item>
+        <item name="boxCornerRadiusTopEnd">14dp</item>
+        <item name="boxCornerRadiusBottomStart">14dp</item>
+        <item name="boxCornerRadiusBottomEnd">14dp</item>
+    </style>
 
+    <!-- ── Screen titles ── -->
+    <style name="ScreenTitle">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/colorTextBrand</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:layout_marginBottom">20dp</item>
+    </style>
+
+    <!-- ── Section headers inside cards ── -->
+    <style name="CardSectionTitle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/colorTextBrand</item>
+        <item name="android:layout_marginBottom">12dp</item>
+    </style>
+
+    <!-- ── Body text ── -->
+    <style name="BodyText">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/colorTextSecondary</item>
+        <item name="android:lineSpacingExtra">4dp</item>
+    </style>
+
+    <!-- ── Drawer menu item text ── -->
+    <style name="DrawerItemText">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/colorTextPrimary</item>
+        <item name="android:layout_marginStart">16dp</item>
     </style>
 
 </resources>

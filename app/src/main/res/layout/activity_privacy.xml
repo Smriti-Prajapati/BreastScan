@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF5F8"
+    android:background="@color/colorBackground"
     android:padding="20dp"
     android:fillViewport="true">
 
@@ -11,39 +12,43 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- TITLE -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Privacy Policy"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="#C2185B"
+            android:textColor="@color/pinkPrimary"
             android:gravity="center"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="6dp" />
 
-        <!-- DATE -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Effective Date: 2026"
             android:textSize="13sp"
-            android:textColor="#777777"
+            android:textColor="@color/colorTextSecondary"
             android:gravity="center"
-            android:layout_marginBottom="18dp"/>
+            android:layout_marginBottom="20dp" />
 
-        <!-- CONTENT -->
-        <TextView
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="This Privacy Policy applies to the BreastScan application developed by Smriti Prajapati.\n\n1. Information We Collect\n\nWe may collect your name, email address, and health-related input values. We do NOT store uploaded images.\n\n2. How We Use Data\n\nYour data is used to generate predictions and improve app performance.\n\n3. Data Storage\n\nWe use Supabase backend services to securely store minimal user data. Sensitive image data is NOT stored.\n\n4. Data Sharing\n\nWe do NOT sell or share your personal data with third parties.\n\n5. Security\n\nWe apply standard security practices, but no system is completely secure.\n\n6. User Rights\n\nYou can request to update or delete your data anytime.\n\n7. Changes to Policy\n\nWe may update this policy from time to time.\n\n8. Contact\n\nDeveloper: Smriti Prajapati\nEmail: smritiprajapati15@gmail.com"
-            android:textSize="15sp"
-            android:textColor="#333333"
-            android:lineSpacingExtra="6dp"/>
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            android:layout_marginBottom="24dp">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="20dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="This Privacy Policy applies to the BreastScan application developed by Smriti Prajapati.\n\n1. Information We Collect\n\nWe may collect your name, email address, and health-related input values. We do NOT store uploaded images.\n\n2. How We Use Data\n\nYour data is used to generate predictions and improve app performance.\n\n3. Data Storage\n\nWe use Supabase backend services to securely store minimal user data. Sensitive image data is NOT stored.\n\n4. Data Sharing\n\nWe do NOT sell or share your personal data with third parties.\n\n5. Security\n\nWe apply standard security practices, but no system is completely secure.\n\n6. User Rights\n\nYou can request to update or delete your data anytime.\n\n7. Changes to Policy\n\nWe may update this policy from time to time.\n\n8. Contact\n\nDeveloper: Smriti Prajapati\nEmail: smritiprajapati15@gmail.com"
+                android:textSize="15sp"
+                android:textColor="@color/colorTextSecondary"
+                android:lineSpacingExtra="6dp"
+                android:padding="24dp" />
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 </ScrollView>

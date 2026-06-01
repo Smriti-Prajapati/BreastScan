@@ -35,6 +35,9 @@
 
         <activity android:name=".OCRReportActivity" />
 
+        <!-- Medical Document Q&A — RAG-powered PDF question answering -->
+        <activity android:name=".MedicalQAActivity" />
+
         <!-- REQUIRED for camera file handling -->
         <provider
             android:name="androidx.core.content.FileProvider"

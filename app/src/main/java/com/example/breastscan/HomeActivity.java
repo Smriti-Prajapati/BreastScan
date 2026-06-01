@@ -36,6 +36,7 @@ public class HomeActivity extends AppCompatActivity {
         btnQuickCheck = findViewById(R.id.btnQuickCheck);
         btnForm = findViewById(R.id.btnForm);
         btnImage = findViewById(R.id.btnImage);
+        LinearLayout btnMedicalQA = findViewById(R.id.btnMedicalQA);
 
         // DRAWER
         btnMenu = findViewById(R.id.btnMenu);
@@ -62,6 +63,9 @@ public class HomeActivity extends AppCompatActivity {
 
         btnImage.setOnClickListener(v ->
                 startActivity(new Intent(HomeActivity.this, ImagePredictionActivity.class)));
+
+        btnMedicalQA.setOnClickListener(v ->
+                startActivity(new Intent(HomeActivity.this, MedicalQAActivity.class)));
 
         // MENU ACTIONS
         menuProfile.setOnClickListener(v ->

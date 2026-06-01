@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#FFF5F8">
+    android:background="@color/colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,32 +13,31 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- TITLE -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Upload &amp; Scan Report"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="#C2185B"
-            android:layout_marginBottom="6dp"/>
+            android:textColor="@color/pinkPrimary"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="6dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Upload your medical report or scan it to extract values"
             android:textSize="14sp"
-            android:textColor="#777777"
-            android:layout_marginBottom="20dp"/>
+            android:textColor="@color/colorTextSecondary"
+            android:layout_marginBottom="20dp" />
 
-        <!-- IMAGE CARD -->
-        <LinearLayout
+        <!-- Image preview card -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="220dp"
-            android:background="@drawable/rounded_card"
-            android:elevation="6dp"
-            android:gravity="center"
-            android:padding="10dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/colorCardBackground"
             android:layout_marginBottom="20dp">
 
             <ImageView
@@ -46,46 +45,41 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="#EEEEEE"/>
-        </LinearLayout>
-
-        <!-- BUTTONS -->
+                android:contentDescription="Report preview" />
+        </androidx.cardview.widget.CardView>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnUpload"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="54dp"
             android:text="Upload Report Image"
             android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            app:cornerRadius="30dp"
-            app:backgroundTint="#C2185B"
-            android:layout_marginBottom="12dp"/>
+            android:textColor="@color/colorTextOnPrimary"
+            android:layout_marginBottom="12dp"
+            app:cornerRadius="16dp"
+            app:backgroundTint="@color/pinkPrimary" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnScan"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="54dp"
             android:text="Scan Using Camera"
             android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            app:cornerRadius="30dp"
-            app:backgroundTint="#E91E63"
-            android:layout_marginBottom="12dp"/>
+            android:textColor="@color/colorTextOnPrimary"
+            android:layout_marginBottom="12dp"
+            app:cornerRadius="16dp"
+            app:backgroundTint="@color/pinkAccent" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnExtract"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="54dp"
             android:text="Extract Values"
             android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            app:cornerRadius="30dp"
-            app:backgroundTint="#AD1457"/>
+            android:textColor="@color/colorTextOnPrimary"
+            android:layout_marginBottom="28dp"
+            app:cornerRadius="16dp"
+            app:backgroundTint="@color/pinkDark" />
 
     </LinearLayout>
-
 </ScrollView>

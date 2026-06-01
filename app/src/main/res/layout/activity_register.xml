@@ -1,70 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
-    android:background="#FFF1F4">
+    android:background="@color/colorBackground"
+    android:fillViewport="true">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="28dp"
+        android:gravity="center_horizontal">
 
-        <!-- Title -->
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/breastscan_logo"
+            android:contentDescription="Logo"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="8dp" />
+
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Register"
+            android:text="Create Account"
             android:textSize="26sp"
             android:textStyle="bold"
-            android:textColor="#C2185B"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="25dp"
-            android:layout_gravity="center_horizontal" />
+            android:textColor="@color/pinkPrimary"
+            android:layout_marginBottom="4dp" />
 
-        <!-- Full Name -->
-        <EditText
-            android:id="@+id/etName"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Join BreastScan today"
+            android:textSize="14sp"
+            android:textColor="@color/colorTextSecondary"
+            android:layout_marginBottom="32dp" />
+
+        <!-- Card -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:hint="Full Name"
-            android:padding="16dp"
-            android:background="@drawable/rounded_edittext_pink" />
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@color/colorCardBackground"
+            android:layout_marginBottom="20dp">
 
-        <!-- Email -->
-        <EditText
-            android:id="@+id/etEmail"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:hint="Email"
-            android:padding="16dp"
-            android:layout_marginTop="16dp"
-            android:inputType="textEmailAddress"
-            android:background="@drawable/rounded_edittext_pink" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
 
-        <!-- Password -->
-        <EditText
-            android:id="@+id/etPassword"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:hint="Password"
-            android:padding="16dp"
-            android:inputType="textPassword"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/rounded_edittext_pink" />
+                <EditText
+                    android:id="@+id/etName"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:hint="Full Name"
+                    android:padding="14dp"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textColorHint="@color/colorTextHint"
+                    android:background="@drawable/rounded_edittext_pink"
+                    android:layout_marginBottom="14dp" />
 
-        <!-- Register Button -->
-        <Button
+                <EditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:hint="Email Address"
+                    android:padding="14dp"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textColorHint="@color/colorTextHint"
+                    android:inputType="textEmailAddress"
+                    android:background="@drawable/rounded_edittext_pink"
+                    android:layout_marginBottom="14dp" />
+
+                <EditText
+                    android:id="@+id/etPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:hint="Password"
+                    android:padding="14dp"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textColorHint="@color/colorTextHint"
+                    android:inputType="textPassword"
+                    android:background="@drawable/rounded_edittext_pink" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRegister"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="Register"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            android:layout_marginTop="26dp"
+            android:layout_height="54dp"
+            android:text="Create Account"
+            android:textSize="16sp"
+            android:textColor="@color/colorTextOnPrimary"
+            android:textAllCaps="false"
             android:onClick="onRegisterClick"
-            android:background="@drawable/rounded_button_pink" />
+            app:cornerRadius="16dp"
+            app:backgroundTint="@color/pinkPrimary" />
 
     </LinearLayout>
 </ScrollView>

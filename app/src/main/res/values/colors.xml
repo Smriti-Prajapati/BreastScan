@@ -1,24 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Brand Pink Shades -->
+    <!-- ── Brand pinks (never change between modes) ── -->
     <color name="pinkPrimary">#C2185B</color>
     <color name="pinkDark">#880E4F</color>
+    <color name="pinkAccent">#E91E63</color>
     <color name="pinkLight">#FFEBF0</color>
+    <color name="pink">#C2185B</color>
 
-    <!-- Required Colors (fixing errors) -->
+    <!-- ── Semantic surface tokens (light mode) ── -->
+    <color name="colorBackground">#FFF1F4</color>
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorSurfaceVariant">#FFF0F6</color>
+    <color name="colorCardBackground">#FFFFFF</color>
+    <color name="colorDrawerBackground">#FFFFFF</color>
+    <color name="colorInputBackground">#FFFFFF</color>
+    <color name="colorDivider">#EEEEEE</color>
+    <color name="colorHeaderBackground">#C2185B</color>
+
+    <!-- ── Semantic text tokens (light mode) ── -->
+    <color name="colorTextPrimary">#1A1A1A</color>
+    <color name="colorTextSecondary">#555555</color>
+    <color name="colorTextHint">#AAAAAA</color>
+    <color name="colorTextOnPrimary">#FFFFFF</color>
+    <color name="colorTextBrand">#C2185B</color>
+
+    <!-- ── Status colors ── -->
+    <color name="green_dark">#2E7D32</color>
+    <color name="red_dark">#C62828</color>
+    <color name="colorSuccess">#2E7D32</color>
+    <color name="colorError">#C62828</color>
+    <color name="colorWarning">#F57F17</color>
+
+    <!-- ── Legacy aliases (keep so existing Java code compiles) ── -->
     <color name="background">#FFF1F4</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-
-    <color name="green_dark">#2E7D32</color>
-    <color name="red_dark">#C62828</color>
-    <color name="pink">#C2185B</color>
-
-
-
     <color name="pinkBackground">#FFF0F6</color>
-
-
 
 </resources>
