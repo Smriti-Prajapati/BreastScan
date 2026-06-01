@@ -1,73 +1,57 @@
-# BreastScan — AI Breast Cancer Prediction App
+# BreastScan
 
-An AI-powered Android application for early breast cancer risk prediction, combining on-device TensorFlow Lite models, OCR report analysis, image-based CNN prediction, a RAG-powered Medical Document Q&A system, and a fully redesigned dark-mode-ready UI.
+An AI-powered Android app for early breast cancer risk assessment. It combines on-device machine learning, OCR-based report analysis, image classification, and a RAG-powered document Q&A system — all in one clean, dark-mode-ready interface.
 
----
-
-## What's New (Latest Update)
-
-### Medical Document Q&A (RAG Module)
-- Upload any medical PDF directly from your phone
-- Ask plain-language questions about the document's content
-- Receive grounded answers with page-level source citations
-- Powered by a Python RAG backend (ChromaDB + HuggingFace flan-t5-large)
-- Every Q&A session is saved to Supabase under the user's account
-- Responsible AI: fallback message when context is insufficient, no fabrication
-
-### Full UI Redesign + Dark Mode
-- Complete UI overhaul across all 14 screens
-- Proper dark mode support — all hardcoded hex colors replaced with semantic `@color/` tokens
-- `values-night/colors.xml` provides a full dark palette (dark backgrounds, bright pink accents)
-- Home screen upgraded with feature cards showing icons, subtitles, and chevron arrows
-- All buttons migrated to `MaterialButton` with consistent corner radius and ripple
-- All content blocks wrapped in `CardView` with elevation and rounded corners
-- Login and Register screens now include the app logo and a cleaner card layout
-- Chatbot YES/NO buttons differentiated — YES filled pink, NO outlined
+> ⚠️ This app is for educational purposes only. It is not a substitute for professional medical advice.
 
 ---
 
-## All Features
+## Features
 
-### Prediction & Analysis
-- **Quick Self Check** — symptom-based questionnaire with risk scoring (Low / Moderate / High)
-- **Form Prediction** — enter 10 clinical measurements; TFLite tabular model predicts Benign/Malignant
-- **Image Prediction** — upload a scan or use the camera; CNN TFLite model classifies the image
-- **OCR Report Analysis** — photograph or upload a medical report; Google ML Kit extracts values automatically and feeds them into the prediction model
+### Quick Self Check
+Answer a short series of yes/no questions about your symptoms. The app scores your responses and gives you a risk level — Low, Moderate, or High — along with a recommendation.
 
-### Medical Document Q&A (RAG)
-- Upload a medical PDF (research paper, discharge summary, clinical report)
-- Backend parses, chunks, and embeds the document using `sentence-transformers/all-MiniLM-L6-v2`
-- Semantic search retrieves the most relevant chunks via ChromaDB
-- `google/flan-t5-large` (free HuggingFace Inference API) generates a grounded answer
-- Answer includes the source page number and relevance score
-- Sessions stored in Supabase `medical_qa_sessions` table per user
+### Form-Based Prediction
+Enter 10 clinical measurements (radius, texture, perimeter, area, etc.) and the app runs them through an on-device TensorFlow Lite model to predict whether a tumour is likely Benign or Malignant, with a confidence score.
 
-### User & App
-- Secure email/password authentication via Supabase Auth
-- User profile with avatar, age, blood group, BMI, medical history
-- Drawer navigation with Profile, Info, Privacy Policy, Terms, Rate Us, Share, Logout
-- Breast Cancer Info screen with educational content
-- Privacy Policy and Terms & Conditions screens
-- Result screens with confidence score display
+### Image Prediction
+Upload a scan image from your gallery or take one with the camera. A CNN model running on-device classifies the image and returns a result with confidence percentage.
+
+### OCR Report Analysis
+Photograph or upload a printed medical report. Google ML Kit reads the text, automatically extracts the relevant values, and feeds them into the prediction model — no manual typing needed.
+
+### Medical Document Q&A
+Upload any medical PDF — a research paper, discharge summary, or clinical report. Ask questions about it in plain language and get answers grounded in the document's actual content, with a citation showing exactly which page the answer came from. If the system isn't confident, it tells you so instead of guessing. Every session is saved to your account history.
+
+### User Profile
+Store your personal health details — age, blood group, BMI, and medical history. Upload a profile photo. All data is securely stored in Supabase.
+
+### Authentication
+Sign up and log in with email and password via Supabase Auth. Your session persists across app restarts.
+
+### Dark Mode
+The app fully adapts to your phone's light or dark mode setting. Every screen, card, button, and input adjusts automatically.
+
+### Educational Content
+Read about breast cancer, browse the Privacy Policy and Terms & Conditions, and find nearby hospitals directly from the app.
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
+| Area | Technology |
 |---|---|
-| Android UI | Java, XML, Material Components 1.12 |
-| On-device ML | TensorFlow Lite 2.12 |
-| OCR | Google ML Kit Text Recognition |
-| Networking | OkHttp 4.12, Gson 2.10 |
-| Image loading | Glide 4.15, Picasso 2.8 |
-| Auth & Database | Supabase (PostgreSQL + Auth) |
-| RAG Backend | Python, Flask, ChromaDB, sentence-transformers |
-| LLM | HuggingFace Inference API (google/flan-t5-large) |
-| PDF parsing | PyMuPDF |
-| Streamlit UI | Streamlit 1.37 (standalone web UI for the RAG module) |
+| Android | Java, XML, Material Components |
+| On-device ML | TensorFlow Lite |
+| OCR | Google ML Kit |
+| Networking | OkHttp, Gson |
+| Auth & Database | Supabase |
+| RAG Backend | Python, Flask, ChromaDB |
+| Embeddings | sentence-transformers (all-MiniLM-L6-v2) |
+| LLM | HuggingFace Inference API (flan-t5-large) |
+| PDF Parsing | PyMuPDF |
+| Web UI | Streamlit |
 | Build | Gradle (Kotlin DSL) |
-| IDE | Android Studio |
 
 ---
 
@@ -75,118 +59,67 @@ An AI-powered Android application for early breast cancer risk prediction, combi
 
 ```
 BreastScan2/
-├── app/
-│   ├── src/main/
-│   │   ├── java/com/example/breastscan/
-│   │   │   ├── SplashActivity.java
-│   │   │   ├── LoginActivity.java
-│   │   │   ├── RegisterActivity.java
-│   │   │   ├── HomeActivity.java
-│   │   │   ├── ChatbotActivity.java          ← Quick Self Check
-│   │   │   ├── FormPredictionActivity.java
-│   │   │   ├── ImagePredictionActivity.java
-│   │   │   ├── ImageResultActivity.java
-│   │   │   ├── OCRReportActivity.java
-│   │   │   ├── ResultActivity.java
-│   │   │   ├── MedicalQAActivity.java        ← NEW: RAG Q&A
-│   │   │   ├── ProfileActivity.java
-│   │   │   ├── InfoActivity.java
-│   │   │   ├── PrivacyActivity.java
-│   │   │   ├── TermsActivity.java
-│   │   │   ├── SupabaseClient.java
-│   │   │   ├── SessionManager.java
-│   │   │   ├── Secrets.java                  ← loads local.properties
-│   │   │   ├── TFLiteHelper.java
-│   │   │   └── UserSession.java
-│   │   ├── assets/
-│   │   │   ├── breast_tabular_model.tflite
-│   │   │   ├── image_model.tflite
-│   │   │   └── local.properties              ← Supabase + backend URLs
-│   │   └── res/
-│   │       ├── layout/                       ← 14 activity layouts
-│   │       ├── drawable/                     ← icons, backgrounds, shapes
-│   │       ├── values/colors.xml             ← light mode semantic tokens
-│   │       ├── values-night/colors.xml       ← dark mode semantic tokens
-│   │       └── values/themes.xml             ← Material theme + button/card styles
+├── app/src/main/
+│   ├── java/com/example/breastscan/   ← all Android activities
+│   ├── assets/                         ← TFLite models + local.properties
+│   └── res/                            ← layouts, drawables, themes
 │
-└── medical_qa/                               ← NEW: Python RAG backend
-    ├── app.py                                ← Streamlit web UI
-    ├── backend.py                            ← Flask REST API
-    ├── rag_pipeline.py                       ← chunking, embedding, retrieval, LLM
-    ├── requirements.txt
-    └── README.md
+└── medical_qa/                         ← Python RAG backend
+    ├── app.py                          ← Streamlit web UI
+    ├── backend.py                      ← Flask REST API
+    ├── rag_pipeline.py                 ← chunking, embedding, retrieval, LLM
+    └── requirements.txt
 ```
 
 ---
 
-## Setup & Run
+## Getting Started
 
 ### Android App
 
-#### Prerequisites
-- Android Studio (latest)
-- Android SDK (API 24+)
-- Java 11
-
-#### Steps
-
-```bash
-git clone https://github.com/Smriti-Prajapati/BreastScan.git
-cd BreastScan
-```
-
-1. Open the project in Android Studio
+1. Clone the repo and open it in Android Studio
 2. Sync Gradle
 3. Add your credentials to `app/src/main/assets/local.properties`:
-   ```properties
-   SUPABASE_URL=https://your-project.supabase.co
-   SUPABASE_ANON_KEY=your-anon-key
-   MEDICAL_QA_BACKEND_URL=https://your-backend.onrender.com
-   ```
-4. Connect an Android device or start an emulator
-5. Run the app
+
+```properties
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+MEDICAL_QA_BACKEND_URL=https://your-backend.onrender.com
+```
+
+4. Run on a device or emulator (API 24+)
 
 ---
 
-### Medical Q&A Python Backend
-
-#### Install dependencies
+### Medical Q&A Backend
 
 ```bash
 cd medical_qa
 pip install -r requirements.txt
-```
 
-#### Run the Flask backend
-
-```bash
+# Start the Flask API
 python backend.py
-```
 
-Starts at `http://localhost:5000`
-
-#### Run the Streamlit web UI (optional — standalone browser UI)
-
-```bash
+# Optionally start the Streamlit web UI
 streamlit run app.py
 ```
 
-Opens at `http://localhost:8501`
+The Flask API runs at `http://localhost:5000`.
+The Streamlit UI runs at `http://localhost:8501`.
 
-#### Deploy to Render (free, no credit card)
+To use with a physical Android device, deploy the backend to [Render](https://render.com) (free tier):
 
-1. Push the repo to GitHub
-2. Go to [render.com](https://render.com) → New Web Service → connect repo
-3. Set Root Directory: `medical_qa`
-4. Build Command: `pip install -r requirements.txt`
-5. Start Command: `python backend.py`
-6. Copy the deployed URL into `local.properties` as `MEDICAL_QA_BACKEND_URL`
+- Root directory: `medical_qa`
+- Build command: `pip install -r requirements.txt`
+- Start command: `python backend.py`
+
+Then paste the Render URL into `local.properties` as `MEDICAL_QA_BACKEND_URL`.
 
 ---
 
-## Supabase Setup
+### Supabase — Q&A Session Table
 
-Run this SQL once in your Supabase SQL Editor to enable Q&A session history:
+Run this once in your Supabase SQL editor:
 
 ```sql
 CREATE TABLE medical_qa_sessions (
@@ -199,7 +132,9 @@ CREATE TABLE medical_qa_sessions (
     source      text,
     created_at  timestamptz DEFAULT now()
 );
+
 ALTER TABLE medical_qa_sessions ENABLE ROW LEVEL SECURITY;
+
 CREATE POLICY "Users see own sessions"
     ON medical_qa_sessions FOR ALL
     USING (auth.uid() = user_id);
@@ -207,72 +142,16 @@ CREATE POLICY "Users see own sessions"
 
 ---
 
-## App Workflow
-
-```
-User opens app
-    │
-    ├── Quick Self Check  → symptom questions → risk score
-    ├── Form Prediction   → clinical values   → TFLite → Benign/Malignant
-    ├── Image Prediction  → scan image        → CNN TFLite → result
-    ├── OCR Report        → photo/upload      → ML Kit OCR → auto-fill → predict
-    └── Medical Q&A       → upload PDF        → RAG backend → answer + source
-                                                    │
-                                                    └── saved to Supabase
-```
-
----
-
-## Dark Mode
-
-The app fully supports Android dark mode. Toggle it in your phone's display settings — all screens adapt automatically:
-
-| Element | Light Mode | Dark Mode |
-|---|---|---|
-| Background | `#FFF1F4` (soft pink-white) | `#0F0F0F` (near black) |
-| Cards | `#FFFFFF` | `#1E1E1E` |
-| Input fields | `#FFFFFF` | `#2A2A2A` |
-| Primary text | `#1A1A1A` | `#F0F0F0` |
-| Brand pink | `#C2185B` | `#E91E63` (brighter) |
-
----
-
 ## Responsible AI
 
-- Every prediction includes a confidence score
-- Every Q&A answer includes the source page and relevance score
-- If the RAG model cannot find a reliable answer: *"I could not find a reliable answer in the document. Please consult a medical professional."*
-- The model is instructed never to fabricate information not present in the document
-- All screens include a medical disclaimer
-
----
-
-## Limitations
-
-- Prediction accuracy depends on input data quality and model training
-- OCR may fail on low-quality or handwritten reports
-- RAG Q&A requires the backend to be running (or deployed)
-- Scanned/image-based PDFs are not supported by the RAG module (text PDFs only)
-- Not a replacement for professional medical diagnosis
-
----
-
-## Future Enhancements
-
-- Improve model accuracy with larger datasets
-- iOS version
-- Multilingual support
-- OCR support for scanned PDFs in the RAG module
-- Telemedicine integration
-- Push notifications for health reminders
+- All predictions include a confidence score
+- Q&A answers always cite the source page and relevance score
+- When the model cannot find a reliable answer it returns: *"I could not find a reliable answer in the document. Please consult a medical professional."*
+- The LLM is instructed never to fabricate information not present in the uploaded document
+- Every screen includes a medical disclaimer
 
 ---
 
 ## Developed By
 
-**Smriti Prajapati**
-📧 smritiprajapati15@gmail.com
-
----
-
-> ⚠️ **Disclaimer:** This application is intended for educational and preliminary assessment purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider.
+Smriti Prajapati
