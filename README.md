@@ -29,9 +29,6 @@ Store your personal health details — age, blood group, BMI, and medical histor
 ### Authentication
 Sign up and log in with email and password via Supabase Auth. Your session persists across app restarts.
 
-### Dark Mode
-The app fully adapts to your phone's light or dark mode setting. Every screen, card, button, and input adjusts automatically.
-
 ### Educational Content
 Read about breast cancer, browse the Privacy Policy and Terms & Conditions, and find nearby hospitals directly from the app.
 
