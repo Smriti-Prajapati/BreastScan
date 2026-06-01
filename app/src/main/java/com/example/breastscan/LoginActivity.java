@@ -5,14 +5,15 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.button.MaterialButton;
 import com.google.gson.JsonObject;
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
-    private Button btnLogin;
+    private MaterialButton btnLogin;
     private TextView tvRegister;
-    private ImageView ivTogglePwd; // 👈 added
+    private ImageView ivTogglePwd;
 
     private boolean isPasswordVisible = false; // 👈 added
 

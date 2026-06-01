@@ -4,11 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.button.MaterialButton;
 
 public class RegisterActivity extends AppCompatActivity {
 
     EditText etName, etEmail, etPassword;
-    Button btnRegister;
+    MaterialButton btnRegister;
 
     @Override
     protected void onCreate(Bundle s) {
