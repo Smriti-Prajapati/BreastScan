@@ -2,33 +2,34 @@
 # Install: pip install -r requirements.txt
 # All packages are free and open-source. No paid API keys required.
 # Optionally set HF_TOKEN env var for higher HuggingFace rate limits.
+#
+# Note: versions are intentionally flexible so pip can resolve
+# compatible wheels for the server's Python version (3.11+).
 
 # ── LangChain ────────────────────────────────────────────────────────────────
-langchain==0.2.16
-langchain-community==0.2.16
+langchain>=0.2.0
+langchain-community>=0.2.0
 
 # ── Vector database ───────────────────────────────────────────────────────────
-chromadb==0.5.3
+chromadb>=0.5.0
 
-# ── Embedding model (runs locally on the server) ─────────────────────────────
-sentence-transformers==3.0.1
+# ── Embedding model (runs locally on the server, no API key needed) ───────────
+sentence-transformers>=2.7.0
 
 # ── HuggingFace ───────────────────────────────────────────────────────────────
-transformers==4.43.3
-huggingface_hub==0.24.5
+transformers>=4.40.0
+huggingface_hub>=0.23.0
 
 # ── PDF parsing ───────────────────────────────────────────────────────────────
-PyMuPDF==1.24.9
+PyMuPDF>=1.24.0
 
 # ── Flask REST API ────────────────────────────────────────────────────────────
-flask==3.0.3
-flask-cors==4.0.1
-Werkzeug==3.0.3
+flask>=3.0.0
+flask-cors>=4.0.0
+Werkzeug>=3.0.0
 
 # ── Streamlit web UI ─────────────────────────────────────────────────────────
-streamlit==1.37.0
+streamlit>=1.35.0
 
-# ── HTTP + numerics ───────────────────────────────────────────────────────────
-requests==2.32.3
-numpy==1.26.4
-torch==2.3.1
+# ── HTTP client ───────────────────────────────────────────────────────────────
+requests>=2.31.0
