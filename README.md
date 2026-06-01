@@ -115,30 +115,6 @@ To use with a physical Android device, deploy the backend to [Render](https://re
 
 Then paste the Render URL into `local.properties` as `MEDICAL_QA_BACKEND_URL`.
 
----
-
-### Supabase — Q&A Session Table
-
-Run this once in your Supabase SQL editor:
-
-```sql
-CREATE TABLE medical_qa_sessions (
-    id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id     uuid REFERENCES auth.users(id) ON DELETE CASCADE,
-    doc_id      text,
-    filename    text,
-    question    text,
-    answer      text,
-    source      text,
-    created_at  timestamptz DEFAULT now()
-);
-
-ALTER TABLE medical_qa_sessions ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users see own sessions"
-    ON medical_qa_sessions FOR ALL
-    USING (auth.uid() = user_id);
-```
 
 ---
 
