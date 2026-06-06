@@ -117,9 +117,9 @@ public class MedicalQAActivity extends AppCompatActivity {
 
     // OkHttp — single instance, reused for all requests
     private final OkHttpClient httpClient = new OkHttpClient.Builder()
-            .connectTimeout(30,  java.util.concurrent.TimeUnit.SECONDS)
-            .readTimeout(120,    java.util.concurrent.TimeUnit.SECONDS)
-            .writeTimeout(60,    java.util.concurrent.TimeUnit.SECONDS)
+            .connectTimeout(60,  java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(180,    java.util.concurrent.TimeUnit.SECONDS)
+            .writeTimeout(120,   java.util.concurrent.TimeUnit.SECONDS)
             .build();
 
     // Single background thread — keeps network calls off the main thread
@@ -246,7 +246,9 @@ public class MedicalQAActivity extends AppCompatActivity {
             return;
         }
         setLoading(true);
-        tvUploadStatus.setVisibility(View.GONE);
+        tvUploadStatus.setVisibility(View.VISIBLE);
+        tvUploadStatus.setTextColor(getResources().getColor(R.color.colorTextSecondary));
+        tvUploadStatus.setText("⏳ Connecting to server… (first request may take ~30s to wake up)");
         cardAnswer.setVisibility(View.GONE);
 
         executor.execute(() -> {
