@@ -4,19 +4,16 @@ rag_pipeline.py
 Core RAG pipeline for the Medical Document Q&A module.
 
 Memory-efficient design for free-tier hosting (512 MB RAM):
-  - Embeddings are generated via the HuggingFace Inference API (remote call)
-    so torch and sentence-transformers are NEVER loaded into server memory.
-  - ChromaDB runs in-memory (no disk persistence needed on stateless servers).
-  - The LLM (flan-t5-large) is also called via the HuggingFace Inference API.
+  - Embeddings via HuggingFace Inference API (no torch/sentence-transformers in memory)
+  - ChromaDB in-memory (EphemeralClient)
+  - LLM via HuggingFace Inference API (flan-t5-large, free)
 
-All models used are free and open-source. No paid API keys required.
-Set the HF_TOKEN environment variable for higher rate limits (free account).
-
+Set HF_TOKEN env var on Render for higher rate limits (free account token).
 NOTE: For educational purposes only. Not a substitute for medical advice.
 """
 
 import os
-import fitz          # PyMuPDF — PDF text extraction
+import fitz          # PyMuPDF
 import chromadb
 
 from huggingface_hub import InferenceClient
@@ -25,57 +22,39 @@ from huggingface_hub import InferenceClient
 # Configuration
 # ---------------------------------------------------------------------------
 
-# Embedding model hosted on HuggingFace (called via API, not loaded locally)
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+EMBEDDING_MODEL    = "sentence-transformers/all-MiniLM-L6-v2"
+LLM_MODEL          = "google/flan-t5-large"
+COLLECTION_NAME    = "medical_docs"
+CHUNK_SIZE         = 800
+CHUNK_OVERLAP      = 100
+TOP_K              = 4
+SIMILARITY_THRESHOLD = 0.20   # lowered slightly so more results come through
 
-# LLM for answer generation (free HuggingFace Inference API)
-LLM_MODEL = "google/flan-t5-large"
-
-# ChromaDB collection name
-COLLECTION_NAME = "medical_docs"
-
-# Chunk settings
-CHUNK_SIZE    = 800   # characters per chunk (~200 words)
-CHUNK_OVERLAP = 100   # overlap between consecutive chunks
-
-# Retrieval
-TOP_K = 4
-
-# Minimum cosine similarity to consider a chunk relevant
-SIMILARITY_THRESHOLD = 0.25
-
-# Shown when the model cannot find a reliable answer
 FALLBACK_ANSWER = (
     "I could not find a reliable answer in the document. "
     "Please consult a medical professional."
 )
 
 # ---------------------------------------------------------------------------
-# Singletons — created once per process
+# Singletons
 # ---------------------------------------------------------------------------
 
-_chroma_client     = None
-_collection        = None
-_inference_client  = None   # single InferenceClient reused for all calls
+_chroma_client    = None
+_collection       = None
+_inference_client = None
 
 
 def _get_hf_client() -> InferenceClient:
-    """Return a shared HuggingFace InferenceClient (lazy init)."""
     global _inference_client
     if _inference_client is None:
         token = os.environ.get("HF_TOKEN", None)
-        # No model set here — we pass the model per-call so one client
-        # can be reused for both embedding and text-generation.
         _inference_client = InferenceClient(token=token)
     return _inference_client
 
 
 def _get_collection():
-    """Return (or create) the in-memory ChromaDB collection."""
     global _chroma_client, _collection
     if _collection is None:
-        # EphemeralClient keeps everything in RAM — no disk writes needed
-        # on a stateless server. Documents are re-uploaded each session.
         _chroma_client = chromadb.EphemeralClient()
         _collection = _chroma_client.get_or_create_collection(
             name=COLLECTION_NAME,
@@ -85,34 +64,69 @@ def _get_collection():
 
 
 # ---------------------------------------------------------------------------
-# Embedding via HuggingFace Inference API
-# (no torch, no sentence-transformers loaded in memory)
+# Embedding — robust numpy/list handling
 # ---------------------------------------------------------------------------
+
+def _to_flat_vector(raw) -> list[float]:
+    """
+    Convert whatever feature_extraction returns into a flat Python list of floats.
+
+    HuggingFace feature_extraction can return:
+      - numpy ndarray of shape (seq_len, dim)  → mean over seq_len axis
+      - numpy ndarray of shape (1, seq_len, dim) → squeeze first, then mean
+      - list of lists (legacy)
+    We handle all cases defensively.
+    """
+    # Convert numpy arrays to nested Python lists once, then handle uniformly
+    try:
+        import numpy as np
+        if isinstance(raw, np.ndarray):
+            raw = raw.tolist()
+    except ImportError:
+        pass  # numpy not installed — raw must already be a list
+
+    # Now raw is a nested list (or already was)
+    # Possible shapes after tolist():
+    #   [dim]                  → already a flat vector
+    #   [[d0, d1, ...], ...]   → (seq_len, dim) → mean over rows
+    #   [[[...], ...], ...]    → (1, seq_len, dim) → unwrap first dim
+
+    if not raw:
+        raise ValueError("feature_extraction returned empty result")
+
+    # Shape: flat vector [float, float, ...]
+    if isinstance(raw[0], float) or isinstance(raw[0], int):
+        return [float(x) for x in raw]
+
+    # Shape: (1, seq_len, dim) — unwrap outer list
+    if isinstance(raw[0][0], list):
+        raw = raw[0]   # now (seq_len, dim)
+
+    # Shape: (seq_len, dim) — mean-pool over seq_len
+    seq_len = len(raw)
+    dim     = len(raw[0])
+    vec = [sum(raw[t][d] for t in range(seq_len)) / seq_len for d in range(dim)]
+    return vec
+
 
 def _embed_texts(texts: list[str]) -> list[list[float]]:
     """
-    Embed a list of texts using the HuggingFace feature-extraction API.
-    Returns a list of float vectors (one per input text).
+    Embed a list of texts via HuggingFace Inference API.
+    Calls the API once per text (rate limit friendly with small chunk counts).
     """
     client = _get_hf_client()
     embeddings = []
-    for text in texts:
-        # feature_extraction returns a nested list; we take the mean-pooled
-        # sentence vector (first element when the model returns [1, seq, dim])
-        result = client.feature_extraction(text, model=EMBEDDING_MODEL)
-        # result shape can be (seq_len, dim) or (1, seq_len, dim)
-        # We need a single 1-D vector — mean-pool over the token dimension
-        if isinstance(result[0][0], list):
-            # shape (1, seq_len, dim) → take [0] then mean over seq_len
-            token_vecs = result[0]
-        else:
-            # shape (seq_len, dim)
-            token_vecs = result
-        vec = [
-            sum(token_vecs[t][d] for t in range(len(token_vecs))) / len(token_vecs)
-            for d in range(len(token_vecs[0]))
-        ]
-        embeddings.append(vec)
+    for i, text in enumerate(texts):
+        try:
+            raw = client.feature_extraction(text, model=EMBEDDING_MODEL)
+            vec = _to_flat_vector(raw)
+            embeddings.append(vec)
+        except Exception as e:
+            print(f"[RAG] Embedding failed for chunk {i}: {e}")
+            raise RuntimeError(
+                f"HuggingFace embedding API error: {e}. "
+                "Make sure HF_TOKEN is set on Render for better rate limits."
+            ) from e
     return embeddings
 
 
@@ -121,12 +135,6 @@ def _embed_texts(texts: list[str]) -> list[list[float]]:
 # ---------------------------------------------------------------------------
 
 def parse_pdf(pdf_path: str) -> list[dict]:
-    """
-    Extract text from every page of a PDF.
-
-    Returns:
-        [{"page": 1, "text": "..."}, ...]
-    """
     pages = []
     doc = fitz.open(pdf_path)
     for i in range(len(doc)):
@@ -139,12 +147,6 @@ def parse_pdf(pdf_path: str) -> list[dict]:
 
 
 def chunk_pages(pages: list[dict]) -> list[dict]:
-    """
-    Split each page into overlapping fixed-size chunks.
-
-    Returns:
-        [{"chunk_id": "p1_c0", "page": 1, "text": "..."}, ...]
-    """
     chunks = []
     for p in pages:
         text = p["text"]
@@ -165,16 +167,12 @@ def chunk_pages(pages: list[dict]) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
-# Ingestion pipeline
+# Ingestion
 # ---------------------------------------------------------------------------
 
 def embed_and_store(chunks: list[dict], doc_id: str) -> int:
-    """
-    Embed all chunks via HuggingFace API and upsert into ChromaDB.
-    Returns the number of chunks stored.
-    """
     collection = _get_collection()
-    texts     = [c["text"]     for c in chunks]
+    texts     = [c["text"] for c in chunks]
     ids       = [f"{doc_id}__{c['chunk_id']}" for c in chunks]
     metadatas = [{"page": c["page"], "doc_id": doc_id} for c in chunks]
 
@@ -192,7 +190,6 @@ def embed_and_store(chunks: list[dict], doc_id: str) -> int:
 
 
 def process_pdf(pdf_path: str, doc_id: str) -> int:
-    """Full ingestion: parse → chunk → embed → store. Returns chunk count."""
     pages = parse_pdf(pdf_path)
     if not pages:
         raise ValueError("The PDF appears to be empty or contains no extractable text.")
@@ -205,16 +202,9 @@ def process_pdf(pdf_path: str, doc_id: str) -> int:
 # ---------------------------------------------------------------------------
 
 def retrieve_chunks(question: str, doc_id: str | None = None) -> list[dict]:
-    """
-    Embed the question and retrieve the top-K most similar chunks.
-
-    Returns:
-        [{"text": "...", "page": 1, "score": 0.87, "doc_id": "..."}, ...]
-    """
-    collection = _get_collection()
-
-    query_vec     = _embed_texts([question])
-    where_filter  = {"doc_id": doc_id} if doc_id else None
+    collection  = _get_collection()
+    query_vec   = _embed_texts([question])
+    where_filter = {"doc_id": doc_id} if doc_id else None
 
     results = collection.query(
         query_embeddings=query_vec,
@@ -234,7 +224,7 @@ def retrieve_chunks(question: str, doc_id: str | None = None) -> list[dict]:
                 "text":   text,
                 "page":   meta.get("page", "?"),
                 "doc_id": meta.get("doc_id", "?"),
-                "score":  round(1.0 - dist, 4),   # cosine distance → similarity
+                "score":  round(1.0 - dist, 4),
             })
 
     print(f"[RAG] Retrieved {len(retrieved)} chunks for: '{question[:60]}'")
@@ -242,11 +232,10 @@ def retrieve_chunks(question: str, doc_id: str | None = None) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
-# Answer generation via HuggingFace Inference API
+# Answer generation
 # ---------------------------------------------------------------------------
 
 def _build_prompt(question: str, chunks: list[dict]) -> str:
-    """Build a grounded prompt that forbids fabrication."""
     context = "\n\n".join(f"[Page {c['page']}]: {c['text']}" for c in chunks)
     return (
         "You are a helpful medical document assistant. "
@@ -259,16 +248,8 @@ def _build_prompt(question: str, chunks: list[dict]) -> str:
 
 
 def generate_answer(question: str, doc_id: str | None = None) -> dict:
-    """
-    Full RAG query: retrieve → prompt → LLM → return answer + source.
-
-    Returns:
-        {"answer": "...", "source": "...", "chunks_used": [...]}
-    """
-    # 1. Retrieve
     chunks = retrieve_chunks(question, doc_id=doc_id)
 
-    # 2. Confidence gate
     if not chunks or chunks[0]["score"] < SIMILARITY_THRESHOLD:
         return {
             "answer":      FALLBACK_ANSWER,
@@ -276,7 +257,6 @@ def generate_answer(question: str, doc_id: str | None = None) -> dict:
             "chunks_used": [],
         }
 
-    # 3. Generate
     prompt = _build_prompt(question, chunks)
     client = _get_hf_client()
 
@@ -296,7 +276,6 @@ def generate_answer(question: str, doc_id: str | None = None) -> dict:
             "chunks_used": chunks,
         }
 
-    # 4. Uncertainty check
     uncertain = [
         "i don't know", "i do not know", "not mentioned",
         "not provided", "cannot find", "no information",
@@ -308,13 +287,11 @@ def generate_answer(question: str, doc_id: str | None = None) -> dict:
             "chunks_used": chunks,
         }
 
-    # 5. Source citation
     best   = chunks[0]
     source = (
         f"Page {best['page']} of document '{best['doc_id']}' "
         f"(relevance score: {best['score']})"
     )
-
     return {
         "answer":      raw,
         "source":      source,

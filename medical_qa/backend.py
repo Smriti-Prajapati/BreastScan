@@ -104,7 +104,7 @@ def upload_pdf():
         return jsonify({"error": str(ve)}), 400
     except Exception as exc:
         app.logger.error(f"Upload error: {exc}", exc_info=True)
-        return jsonify({"error": "Internal error while processing the PDF."}), 500
+        return jsonify({"error": f"Internal error: {str(exc)}"}), 500
     finally:
         if tmp_path and os.path.exists(tmp_path):
             os.remove(tmp_path)
