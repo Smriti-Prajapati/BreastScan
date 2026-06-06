@@ -23,7 +23,7 @@ from huggingface_hub import InferenceClient
 # ---------------------------------------------------------------------------
 
 EMBEDDING_MODEL    = "sentence-transformers/all-MiniLM-L6-v2"
-LLM_MODEL          = "mistralai/Mistral-7B-Instruct-v0.3"
+LLM_MODEL          = "HuggingFaceH4/zephyr-7b-beta"
 COLLECTION_NAME    = "medical_docs"
 CHUNK_SIZE         = 800
 CHUNK_OVERLAP      = 100
@@ -237,13 +237,17 @@ def retrieve_chunks(question: str, doc_id: str | None = None) -> list[dict]:
 
 def _build_prompt(question: str, chunks: list[dict]) -> str:
     context = "\n\n".join(f"[Page {c['page']}]: {c['text']}" for c in chunks)
+    # Zephyr chat template format
     return (
+        "<|system|>\n"
         "You are a helpful medical document assistant. "
-        "Answer the question using ONLY the context below. "
-        "If the answer is not in the context, say you don't know.\n\n"
+        "Answer using ONLY the context provided. "
+        "If the answer is not in the context, say you don't know. "
+        "Never fabricate information.</s>\n"
+        "<|user|>\n"
         f"Context:\n{context}\n\n"
-        f"Question: {question}\n\n"
-        "Answer:"
+        f"Question: {question}</s>\n"
+        "<|assistant|>\n"
     )
 
 
@@ -261,28 +265,18 @@ def generate_answer(question: str, doc_id: str | None = None) -> dict:
     client = _get_hf_client()
 
     try:
-        # Use chat_completion for instruction-tuned models (Mistral, Zephyr, etc.)
-        response = client.chat_completion(
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a helpful medical document assistant. "
-                        "Answer questions using ONLY the provided context. "
-                        "If the answer is not in the context, say you don't know. "
-                        "Never fabricate information."
-                    ),
-                },
-                {
-                    "role": "user",
-                    "content": prompt,
-                },
-            ],
+        # zephyr-7b-beta uses text_generation with a chat-style prompt
+        raw = client.text_generation(
+            prompt,
             model=LLM_MODEL,
-            max_tokens=256,
+            max_new_tokens=300,
             temperature=0.2,
-        )
-        raw = response.choices[0].message.content.strip()
+            repetition_penalty=1.1,
+            do_sample=False,
+        ).strip()
+        # Strip any trailing prompt echo
+        if "Answer:" in raw:
+            raw = raw.split("Answer:")[-1].strip()
     except Exception as exc:
         print(f"[RAG] LLM call failed: {exc}")
         return {
