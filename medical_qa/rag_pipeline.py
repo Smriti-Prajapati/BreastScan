@@ -23,7 +23,7 @@ from huggingface_hub import InferenceClient
 # ---------------------------------------------------------------------------
 
 EMBEDDING_MODEL    = "sentence-transformers/all-MiniLM-L6-v2"
-LLM_MODEL          = "google/flan-t5-large"
+LLM_MODEL          = "mistralai/Mistral-7B-Instruct-v0.3"
 COLLECTION_NAME    = "medical_docs"
 CHUNK_SIZE         = 800
 CHUNK_OVERLAP      = 100
@@ -261,18 +261,33 @@ def generate_answer(question: str, doc_id: str | None = None) -> dict:
     client = _get_hf_client()
 
     try:
-        raw = client.text_generation(
-            prompt,
+        # Use chat_completion for instruction-tuned models (Mistral, Zephyr, etc.)
+        response = client.chat_completion(
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a helpful medical document assistant. "
+                        "Answer questions using ONLY the provided context. "
+                        "If the answer is not in the context, say you don't know. "
+                        "Never fabricate information."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
             model=LLM_MODEL,
-            max_new_tokens=256,
+            max_tokens=256,
             temperature=0.2,
-            repetition_penalty=1.2,
-        ).strip()
+        )
+        raw = response.choices[0].message.content.strip()
     except Exception as exc:
         print(f"[RAG] LLM call failed: {exc}")
         return {
             "answer":      FALLBACK_ANSWER,
-            "source":      "N/A — LLM inference error.",
+            "source":      f"N/A — LLM inference error: {exc}",
             "chunks_used": chunks,
         }
 
