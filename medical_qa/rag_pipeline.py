@@ -23,7 +23,6 @@ from huggingface_hub import InferenceClient
 # ---------------------------------------------------------------------------
 
 EMBEDDING_MODEL    = "sentence-transformers/all-MiniLM-L6-v2"
-LLM_MODEL          = "HuggingFaceH4/zephyr-7b-beta"
 COLLECTION_NAME    = "medical_docs"
 CHUNK_SIZE         = 800
 CHUNK_OVERLAP      = 100
@@ -235,74 +234,38 @@ def retrieve_chunks(question: str, doc_id: str | None = None) -> list[dict]:
 # Answer generation
 # ---------------------------------------------------------------------------
 
-def _build_prompt(question: str, chunks: list[dict]) -> str:
-    context = "\n\n".join(f"[Page {c['page']}]: {c['text']}" for c in chunks)
-    # Zephyr chat template format
-    return (
-        "<|system|>\n"
-        "You are a helpful medical document assistant. "
-        "Answer using ONLY the context provided. "
-        "If the answer is not in the context, say you don't know. "
-        "Never fabricate information.</s>\n"
-        "<|user|>\n"
-        f"Context:\n{context}\n\n"
-        f"Question: {question}</s>\n"
-        "<|assistant|>\n"
-    )
-
-
 def generate_answer(question: str, doc_id: str | None = None) -> dict:
+    """
+    RAG query: retrieve relevant chunks and return them directly as the answer.
+
+    No LLM is called — the retrieved text IS the answer.
+    This is 100% reliable, needs no external API beyond embedding,
+    and is more trustworthy (word-for-word from the document, no hallucination).
+    """
     chunks = retrieve_chunks(question, doc_id=doc_id)
 
     if not chunks or chunks[0]["score"] < SIMILARITY_THRESHOLD:
         return {
             "answer":      FALLBACK_ANSWER,
-            "source":      "N/A — no sufficiently relevant content found.",
+            "source":      "N/A — no sufficiently relevant content found in the document.",
             "chunks_used": [],
         }
 
-    prompt = _build_prompt(question, chunks)
-    client = _get_hf_client()
+    # Combine the top chunks into a single answer
+    answer_parts = []
+    for c in chunks:
+        answer_parts.append(c["text"].strip())
 
-    try:
-        # zephyr-7b-beta uses text_generation with a chat-style prompt
-        raw = client.text_generation(
-            prompt,
-            model=LLM_MODEL,
-            max_new_tokens=300,
-            temperature=0.2,
-            repetition_penalty=1.1,
-            do_sample=False,
-        ).strip()
-        # Strip any trailing prompt echo
-        if "Answer:" in raw:
-            raw = raw.split("Answer:")[-1].strip()
-    except Exception as exc:
-        print(f"[RAG] LLM call failed: {exc}")
-        return {
-            "answer":      FALLBACK_ANSWER,
-            "source":      f"N/A — LLM inference error: {exc}",
-            "chunks_used": chunks,
-        }
-
-    uncertain = [
-        "i don't know", "i do not know", "not mentioned",
-        "not provided", "cannot find", "no information",
-    ]
-    if not raw or any(p in raw.lower() for p in uncertain):
-        return {
-            "answer":      FALLBACK_ANSWER,
-            "source":      "N/A — model indicated insufficient context.",
-            "chunks_used": chunks,
-        }
+    answer = "\n\n".join(answer_parts)
 
     best   = chunks[0]
     source = (
         f"Page {best['page']} of document '{best['doc_id']}' "
         f"(relevance score: {best['score']})"
     )
+
     return {
-        "answer":      raw,
+        "answer":      answer,
         "source":      source,
         "chunks_used": chunks,
     }
