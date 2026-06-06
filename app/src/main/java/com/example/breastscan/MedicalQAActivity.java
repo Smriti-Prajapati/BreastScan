@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.gson.JsonObject;
@@ -95,7 +95,7 @@ public class MedicalQAActivity extends AppCompatActivity {
     private MaterialButton btnAsk;
     private EditText       etQuestion;
     private ProgressBar    progressBar;
-    private LinearLayout   cardAnswer;
+    private CardView       cardAnswer;
     private TextView       tvAnswer;
     private TextView       tvSource;
 
