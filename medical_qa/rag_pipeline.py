@@ -3,31 +3,39 @@ rag_pipeline.py
 ---------------
 Core RAG pipeline for the Medical Document Q&A module.
 
-Memory-efficient design for free-tier hosting (512 MB RAM):
-  - Embeddings via HuggingFace Inference API (no torch/sentence-transformers in memory)
-  - ChromaDB in-memory (EphemeralClient)
-  - LLM via HuggingFace Inference API (flan-t5-large, free)
+Architecture:
+  - PDF parsing:  PyMuPDF
+  - Embeddings:   HuggingFace Inference API (all-MiniLM-L6-v2)
+  - Vector store: ChromaDB (in-memory)
+  - LLM:          HuggingFace Inference API (multiple models tried in order)
 
-Set HF_TOKEN env var on Render for higher rate limits (free account token).
+Set HF_TOKEN on Render for authenticated access (free account token).
 NOTE: For educational purposes only. Not a substitute for medical advice.
 """
 
 import os
-import fitz          # PyMuPDF
+import fitz
 import chromadb
-
 from huggingface_hub import InferenceClient
 
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
 
-EMBEDDING_MODEL    = "sentence-transformers/all-MiniLM-L6-v2"
-COLLECTION_NAME    = "medical_docs"
-CHUNK_SIZE         = 800
-CHUNK_OVERLAP      = 100
-TOP_K              = 4
-SIMILARITY_THRESHOLD = 0.20   # lowered slightly so more results come through
+EMBEDDING_MODEL   = "sentence-transformers/all-MiniLM-L6-v2"
+COLLECTION_NAME   = "medical_docs"
+CHUNK_SIZE        = 800
+CHUNK_OVERLAP     = 100
+TOP_K             = 4
+SIMILARITY_THRESHOLD = 0.10  # very low — short docs always get results
+
+# Try these models in order until one works
+LLM_CANDIDATES = [
+    "google/flan-t5-xxl",
+    "google/flan-t5-large",
+    "google/flan-t5-base",
+    "facebook/bart-large-cnn",
+]
 
 FALLBACK_ANSWER = (
     "I could not find a reliable answer in the document. "
@@ -40,15 +48,15 @@ FALLBACK_ANSWER = (
 
 _chroma_client    = None
 _collection       = None
-_inference_client = None
+_hf_client        = None
 
 
 def _get_hf_client() -> InferenceClient:
-    global _inference_client
-    if _inference_client is None:
+    global _hf_client
+    if _hf_client is None:
         token = os.environ.get("HF_TOKEN", None)
-        _inference_client = InferenceClient(token=token)
-    return _inference_client
+        _hf_client = InferenceClient(token=token)
+    return _hf_client
 
 
 def _get_collection():
@@ -63,69 +71,42 @@ def _get_collection():
 
 
 # ---------------------------------------------------------------------------
-# Embedding — robust numpy/list handling
+# Embedding
 # ---------------------------------------------------------------------------
 
 def _to_flat_vector(raw) -> list[float]:
-    """
-    Convert whatever feature_extraction returns into a flat Python list of floats.
-
-    HuggingFace feature_extraction can return:
-      - numpy ndarray of shape (seq_len, dim)  → mean over seq_len axis
-      - numpy ndarray of shape (1, seq_len, dim) → squeeze first, then mean
-      - list of lists (legacy)
-    We handle all cases defensively.
-    """
-    # Convert numpy arrays to nested Python lists once, then handle uniformly
+    """Convert HF feature_extraction output to a flat float list."""
     try:
         import numpy as np
         if isinstance(raw, np.ndarray):
-            raw = raw.tolist()
+            if raw.ndim == 3:
+                raw = raw[0]
+            if raw.ndim == 2:
+                raw = raw.mean(axis=0)
+            return raw.tolist()
     except ImportError:
-        pass  # numpy not installed — raw must already be a list
-
-    # Now raw is a nested list (or already was)
-    # Possible shapes after tolist():
-    #   [dim]                  → already a flat vector
-    #   [[d0, d1, ...], ...]   → (seq_len, dim) → mean over rows
-    #   [[[...], ...], ...]    → (1, seq_len, dim) → unwrap first dim
+        pass
 
     if not raw:
         raise ValueError("feature_extraction returned empty result")
-
-    # Shape: flat vector [float, float, ...]
-    if isinstance(raw[0], float) or isinstance(raw[0], int):
+    if isinstance(raw[0], (float, int)):
         return [float(x) for x in raw]
-
-    # Shape: (1, seq_len, dim) — unwrap outer list
     if isinstance(raw[0][0], list):
-        raw = raw[0]   # now (seq_len, dim)
-
-    # Shape: (seq_len, dim) — mean-pool over seq_len
+        raw = raw[0]
     seq_len = len(raw)
     dim     = len(raw[0])
-    vec = [sum(raw[t][d] for t in range(seq_len)) / seq_len for d in range(dim)]
-    return vec
+    return [sum(raw[t][d] for t in range(seq_len)) / seq_len for d in range(dim)]
 
 
 def _embed_texts(texts: list[str]) -> list[list[float]]:
-    """
-    Embed a list of texts via HuggingFace Inference API.
-    Calls the API once per text (rate limit friendly with small chunk counts).
-    """
     client = _get_hf_client()
     embeddings = []
     for i, text in enumerate(texts):
         try:
             raw = client.feature_extraction(text, model=EMBEDDING_MODEL)
-            vec = _to_flat_vector(raw)
-            embeddings.append(vec)
+            embeddings.append(_to_flat_vector(raw))
         except Exception as e:
-            print(f"[RAG] Embedding failed for chunk {i}: {e}")
-            raise RuntimeError(
-                f"HuggingFace embedding API error: {e}. "
-                "Make sure HF_TOKEN is set on Render for better rate limits."
-            ) from e
+            raise RuntimeError(f"Embedding error on chunk {i}: {e}") from e
     return embeddings
 
 
@@ -141,7 +122,7 @@ def parse_pdf(pdf_path: str) -> list[dict]:
         if text:
             pages.append({"page": i + 1, "text": text})
     doc.close()
-    print(f"[RAG] Parsed {len(pages)} pages from '{pdf_path}'")
+    print(f"[RAG] Parsed {len(pages)} pages")
     return pages
 
 
@@ -149,10 +130,9 @@ def chunk_pages(pages: list[dict]) -> list[dict]:
     chunks = []
     for p in pages:
         text = p["text"]
-        idx  = 0
-        ci   = 0
+        idx, ci = 0, 0
         while idx < len(text):
-            chunk_text = text[idx : idx + CHUNK_SIZE].strip()
+            chunk_text = text[idx: idx + CHUNK_SIZE].strip()
             if chunk_text:
                 chunks.append({
                     "chunk_id": f"p{p['page']}_c{ci}",
@@ -175,23 +155,18 @@ def embed_and_store(chunks: list[dict], doc_id: str) -> int:
     ids       = [f"{doc_id}__{c['chunk_id']}" for c in chunks]
     metadatas = [{"page": c["page"], "doc_id": doc_id} for c in chunks]
 
-    print(f"[RAG] Embedding {len(texts)} chunks via HuggingFace API …")
+    print(f"[RAG] Embedding {len(texts)} chunks …")
     embeddings = _embed_texts(texts)
-
-    collection.upsert(
-        ids=ids,
-        embeddings=embeddings,
-        documents=texts,
-        metadatas=metadatas,
-    )
-    print(f"[RAG] Stored {len(chunks)} chunks for doc_id='{doc_id}'")
+    collection.upsert(ids=ids, embeddings=embeddings,
+                      documents=texts, metadatas=metadatas)
+    print(f"[RAG] Stored {len(chunks)} chunks for '{doc_id}'")
     return len(chunks)
 
 
 def process_pdf(pdf_path: str, doc_id: str) -> int:
     pages = parse_pdf(pdf_path)
     if not pages:
-        raise ValueError("The PDF appears to be empty or contains no extractable text.")
+        raise ValueError("The PDF is empty or contains no extractable text.")
     chunks = chunk_pages(pages)
     return embed_and_store(chunks, doc_id)
 
@@ -201,8 +176,8 @@ def process_pdf(pdf_path: str, doc_id: str) -> int:
 # ---------------------------------------------------------------------------
 
 def retrieve_chunks(question: str, doc_id: str | None = None) -> list[dict]:
-    collection  = _get_collection()
-    query_vec   = _embed_texts([question])
+    collection   = _get_collection()
+    query_vec    = _embed_texts([question])
     where_filter = {"doc_id": doc_id} if doc_id else None
 
     results = collection.query(
@@ -225,9 +200,43 @@ def retrieve_chunks(question: str, doc_id: str | None = None) -> list[dict]:
                 "doc_id": meta.get("doc_id", "?"),
                 "score":  round(1.0 - dist, 4),
             })
-
-    print(f"[RAG] Retrieved {len(retrieved)} chunks for: '{question[:60]}'")
+    print(f"[RAG] Retrieved {len(retrieved)} chunks")
     return retrieved
+
+
+# ---------------------------------------------------------------------------
+# LLM call — tries multiple models until one succeeds
+# ---------------------------------------------------------------------------
+
+def _call_llm(prompt: str) -> str:
+    """
+    Try each LLM candidate in order.
+    Returns the first successful response, or raises if all fail.
+    """
+    client = _get_hf_client()
+    last_error = None
+
+    for model in LLM_CANDIDATES:
+        try:
+            print(f"[RAG] Trying model: {model}")
+            result = client.text_generation(
+                prompt,
+                model=model,
+                max_new_tokens=300,
+                temperature=0.1,
+                repetition_penalty=1.3,
+                do_sample=False,
+            )
+            text = result.strip() if isinstance(result, str) else str(result).strip()
+            if text:
+                print(f"[RAG] Success with model: {model}")
+                return text
+        except Exception as e:
+            print(f"[RAG] Model {model} failed: {e}")
+            last_error = e
+            continue
+
+    raise RuntimeError(f"All LLM models failed. Last error: {last_error}")
 
 
 # ---------------------------------------------------------------------------
@@ -236,27 +245,29 @@ def retrieve_chunks(question: str, doc_id: str | None = None) -> list[dict]:
 
 def generate_answer(question: str, doc_id: str | None = None) -> dict:
     """
-    RAG query: retrieve relevant chunks and return them directly as the answer.
-
-    No LLM is called — the retrieved text IS the answer.
-    This is 100% reliable, needs no external API beyond embedding,
-    and is more trustworthy (word-for-word from the document, no hallucination).
+    Full RAG pipeline: retrieve → LLM → answer.
+    Falls back to returning document text directly if all LLMs fail.
     """
     chunks = retrieve_chunks(question, doc_id=doc_id)
 
     if not chunks or chunks[0]["score"] < SIMILARITY_THRESHOLD:
         return {
             "answer":      FALLBACK_ANSWER,
-            "source":      "N/A — no sufficiently relevant content found in the document.",
+            "source":      "N/A — no relevant content found in the document.",
             "chunks_used": [],
         }
 
-    # Combine the top chunks into a single answer
-    answer_parts = []
-    for c in chunks:
-        answer_parts.append(c["text"].strip())
+    context = "\n\n".join(
+        f"[Page {c['page']}]: {c['text']}" for c in chunks
+    )
 
-    answer = "\n\n".join(answer_parts)
+    # Flan-T5 prompt format (instruction-answer style)
+    prompt = (
+        f"Answer the question based only on the following document excerpt.\n\n"
+        f"Document:\n{context}\n\n"
+        f"Question: {question}\n\n"
+        f"Answer:"
+    )
 
     best   = chunks[0]
     source = (
@@ -264,8 +275,34 @@ def generate_answer(question: str, doc_id: str | None = None) -> dict:
         f"(relevance score: {best['score']})"
     )
 
-    return {
-        "answer":      answer,
-        "source":      source,
-        "chunks_used": chunks,
-    }
+    try:
+        answer = _call_llm(prompt)
+
+        uncertain = [
+            "i don't know", "i do not know", "not mentioned",
+            "not provided", "cannot find", "no information",
+            "not available", "not stated",
+        ]
+        if any(p in answer.lower() for p in uncertain):
+            return {
+                "answer":      FALLBACK_ANSWER,
+                "source":      "N/A — answer not found in document.",
+                "chunks_used": chunks,
+            }
+
+        return {
+            "answer":      answer,
+            "source":      source,
+            "chunks_used": chunks,
+        }
+
+    except Exception as exc:
+        print(f"[RAG] All LLMs failed, falling back to raw text. Error: {exc}")
+        # Last resort: return the most relevant chunk directly
+        return {
+            "answer": (
+                f"Based on the document:\n\n{chunks[0]['text']}"
+            ),
+            "source":      source,
+            "chunks_used": chunks,
+        }
