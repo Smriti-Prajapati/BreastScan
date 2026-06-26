@@ -4,7 +4,7 @@ An AI-powered Android app for early breast cancer risk assessment. It combines o
 
 > This app is for educational purposes only. It is not a substitute for professional medical advice.
 
----
+--- 
 
 ## Features
 
