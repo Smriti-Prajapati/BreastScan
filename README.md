@@ -3,7 +3,7 @@
 An AI-powered Android app for early breast cancer risk assessment. It combines on-device machine learning, OCR-based report analysis, image classification, and a RAG-powered document Q&A system — all in one clean, dark-mode-ready interface.
 
 > This app is for educational purposes only. It is not a substitute for professional medical advice.
-
+ 
 --- 
 
 ## Features
