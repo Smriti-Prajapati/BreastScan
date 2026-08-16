@@ -1,0 +1,10 @@
+Copyright (c) 2026 Smriti Prajapati. All Rights Reserved.
+
+Project Name: BreastScan
+Project Description: An AI-powered Android app for early breast cancer risk assessment — combining on-device ML, OCR report analysis, image classification, and a RAG-powered medical document Q&A system.
+
+This software, including all accompanying source code, machine learning model weights, UI layouts, assets, configurations, and documentation, is strictly proprietary and confidential. 
+
+No part of this repository may be copied, reproduced, cloned, downloaded, distributed, forked, or modified in any form or by any means (including mechanical, electronic, or architectural replication of the underlying ML/RAG systems) without the prior explicit written permission of the copyright owner.
+
+Unauthorized copying or distribution of this software via any medium is strictly prohibited.
